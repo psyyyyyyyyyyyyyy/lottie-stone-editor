@@ -132,6 +132,29 @@ input[type="file"]{display:none}
 .crop-adjust.visible{display:block}
 .crop-adjust .sec-title{font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;gap:6px}
 
+/* Gallery */
+.gallery-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.gallery-toolbar .count{margin-left:auto;font-size:12px;color:var(--text-dim)}
+.gallery-size-btns{display:flex;gap:4px}
+.gallery-size-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-up);color:var(--text);font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
+.gallery-size-btn:hover{background:var(--border)}
+.gallery-size-btn.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.gallery-drop{background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:16px}
+.gallery-drop:hover{border-color:var(--accent)}
+.gallery-drop .drop-icon{font-size:32px;margin-bottom:6px}
+.gallery-drop .drop-text{color:var(--text-dim);font-size:13px}
+.gallery-drop .drop-text strong{color:var(--text)}
+.gallery-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(var(--gallery-card-size,180px),1fr))}
+.gallery-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;transition:border-color .2s}
+.gallery-card:hover{border-color:var(--text-dim)}
+.gallery-card canvas{width:100%;aspect-ratio:1;display:block;background:var(--surface)}
+.gallery-card .card-info{padding:8px 10px;display:flex;align-items:center;gap:6px}
+.gallery-card .card-name{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.gallery-card .card-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:background .15s;flex-shrink:0}
+.gallery-card .card-del:hover{background:rgba(248,81,73,.15)}
+.gallery-empty{text-align:center;padding:60px 20px;color:var(--text-dim);font-size:14px}
+.gallery-empty .empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+
 @media(max-width:780px){.main{flex-direction:column;align-items:center}.preview-section{position:static}.crop-container{flex-direction:column;align-items:center}.crop-preview-section{position:static}:root{--preview-size:min(90vw,400px)}}
 </style>
 </head>
@@ -144,6 +167,7 @@ input[type="file"]{display:none}
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="customizer" onclick="switchTab('customizer')">🎨 커스터마이저</button>
     <button class="tab-btn" data-tab="crop" onclick="switchTab('crop')">✂️ Lottie 자르기</button>
+    <button class="tab-btn" data-tab="gallery" onclick="switchTab('gallery')">🖼️ 갤러리</button>
   </nav>
 
   <div class="tab-content active" id="tab-customizer">
@@ -340,6 +364,29 @@ input[type="file"]{display:none}
       </section>
     </div>
   </div><!-- /tab-crop -->
+
+  <div class="tab-content" id="tab-gallery">
+    <div class="gallery-toolbar">
+      <button class="btn btn-upload" onclick="document.getElementById('galleryFileInput').click()">📂 파일 추가</button>
+      <button class="btn btn-remove" id="galleryClearBtn" style="display:none" onclick="clearGallery()">전체 삭제</button>
+      <input type="file" id="galleryFileInput" accept=".json" multiple onchange="handleGalleryUpload(this)">
+      <div class="gallery-size-btns">
+        <button class="gallery-size-btn" data-gsize="120" onclick="setGallerySize(120,this)">S</button>
+        <button class="gallery-size-btn active" data-gsize="180" onclick="setGallerySize(180,this)">M</button>
+        <button class="gallery-size-btn" data-gsize="260" onclick="setGallerySize(260,this)">L</button>
+      </div>
+      <span class="count" id="galleryCount">0개</span>
+    </div>
+    <div class="gallery-drop" id="galleryDrop" onclick="document.getElementById('galleryFileInput').click()">
+      <div class="drop-icon">📂</div>
+      <div class="drop-text"><strong>Lottie JSON 파일을 드래그하거나 클릭</strong><br>여러 파일을 한 번에 올릴 수 있습니다</div>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+    <div class="gallery-empty" id="galleryEmpty">
+      <div class="empty-icon">🖼️</div>
+      파일을 업로드하면 여기에 미리보기가 표시됩니다
+    </div>
+  </div><!-- /tab-gallery -->
 </div>
 
 <script>
@@ -1075,7 +1122,8 @@ function switchTab(tabId) {
   document.getElementById('tab-'+tabId).classList.add('active');
   const subtitles = {
     customizer: '움직임을 선택하고, 눈·입·악세서리를 올려 나만의 돌맹이를 만들어보세요',
-    crop: '완성된 Lottie 파일을 300×300 크기로 조절하여 추출하세요'
+    crop: '완성된 Lottie 파일을 300×300 크기로 조절하여 추출하세요',
+    gallery: 'Lottie JSON 파일을 올려 한눈에 미리보기하세요'
   };
   document.getElementById('headerSubtitle').textContent = subtitles[tabId] || '';
 }
@@ -1264,6 +1312,119 @@ cropArea.addEventListener('drop', e => {
     document.getElementById('cropFileInput').files = dt.files;
     handleCropUpload(document.getElementById('cropFileInput'));
   }
+});
+
+// ─── Gallery ───
+const galleryItems = [];
+
+function handleGalleryUpload(input) {
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  let loaded = 0;
+  files.forEach(file => {
+    if(!file.name.endsWith('.json')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        addGalleryItem(file.name, data);
+      } catch {}
+      if(++loaded >= files.length) input.value='';
+    };
+    reader.readAsText(file);
+  });
+}
+
+function addGalleryItem(name, data) {
+  const id = 'gal_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  galleryItems.push({id, name, data, blobUrl:null, anim:null});
+  updateGalleryUI();
+  renderGalleryItem(galleryItems[galleryItems.length-1]);
+}
+
+function removeGalleryItem(id) {
+  const idx = galleryItems.findIndex(g=>g.id===id);
+  if(idx<0) return;
+  const item = galleryItems[idx];
+  if(item.anim){try{item.anim.destroy();}catch{}}
+  if(item.blobUrl) URL.revokeObjectURL(item.blobUrl);
+  galleryItems.splice(idx,1);
+  const card = document.getElementById(id);
+  if(card) card.remove();
+  updateGalleryUI();
+}
+
+function clearGallery() {
+  galleryItems.forEach(item => {
+    if(item.anim){try{item.anim.destroy();}catch{}}
+    if(item.blobUrl) URL.revokeObjectURL(item.blobUrl);
+  });
+  galleryItems.length = 0;
+  document.getElementById('galleryGrid').innerHTML = '';
+  updateGalleryUI();
+}
+
+function updateGalleryUI() {
+  const n = galleryItems.length;
+  document.getElementById('galleryCount').textContent = n+'개';
+  document.getElementById('galleryEmpty').style.display = n ? 'none' : 'block';
+  document.getElementById('galleryClearBtn').style.display = n ? '' : 'none';
+}
+
+function renderGalleryItem(item) {
+  if(!window.__DotLottie) return;
+  const grid = document.getElementById('galleryGrid');
+  const card = document.createElement('div');
+  card.className = 'gallery-card';
+  card.id = item.id;
+  const canvas = document.createElement('canvas');
+  canvas.width = 400; canvas.height = 400;
+  const info = document.createElement('div');
+  info.className = 'card-info';
+  const nameEl = document.createElement('span');
+  nameEl.className = 'card-name';
+  nameEl.textContent = item.name;
+  nameEl.title = item.name;
+  const delBtn = document.createElement('button');
+  delBtn.className = 'card-del';
+  delBtn.textContent = '✕';
+  delBtn.onclick = () => removeGalleryItem(item.id);
+  info.appendChild(nameEl);
+  info.appendChild(delBtn);
+  card.appendChild(canvas);
+  card.appendChild(info);
+  grid.appendChild(card);
+
+  const blob = new Blob([JSON.stringify(item.data)],{type:'application/json'});
+  item.blobUrl = URL.createObjectURL(blob);
+  item.anim = new window.__DotLottie({
+    canvas, autoplay:true, loop:true,
+    src: item.blobUrl,
+    renderConfig:{devicePixelRatio:2}
+  });
+}
+
+function setGallerySize(size, btn) {
+  document.querySelectorAll('.gallery-size-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('galleryGrid').style.setProperty('--gallery-card-size', size+'px');
+}
+
+// Gallery drag & drop
+const galleryDrop = document.getElementById('galleryDrop');
+galleryDrop.addEventListener('dragover', e => { e.preventDefault(); galleryDrop.style.borderColor='var(--accent)'; });
+galleryDrop.addEventListener('dragleave', () => { galleryDrop.style.borderColor=''; });
+galleryDrop.addEventListener('drop', e => {
+  e.preventDefault(); galleryDrop.style.borderColor='';
+  const files = Array.from(e.dataTransfer.files).filter(f=>f.name.endsWith('.json'));
+  if(!files.length) return;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try { addGalleryItem(file.name, JSON.parse(ev.target.result)); } catch {}
+    };
+    reader.readAsText(file);
+  });
 });
 
 if (window.__DotLottie) {
