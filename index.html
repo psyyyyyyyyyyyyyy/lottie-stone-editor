@@ -58,6 +58,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 /* Control groups */
 .control-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color .2s}
 .control-group.active{border-color:var(--accent)}
+.control-group[data-type="bgBack"] .group-header .dot{background:#f0883e}
 .control-group[data-type="background"] .group-header .dot{background:var(--success)}
 .control-group[data-type="eyes"] .group-header .dot{background:var(--eyes-color)}
 .control-group[data-type="mouth"] .group-header .dot{background:var(--mouth-color)}
@@ -304,6 +305,31 @@ input[type="file"]{display:none}
         </div>
       </div>
 
+      <!-- Back Background (behind stone) -->
+      <div class="control-group" data-type="bgBack" tabindex="0">
+        <div class="group-header"><div class="dot"></div><span class="label">🎑 뒷배경</span><span class="status" id="bgBackStatus">파일 없음</span></div>
+        <div class="upload-row">
+          <button class="btn btn-upload" onclick="document.getElementById('bgBackFile').click()">JSON 파일 선택</button>
+          <span class="file-name" id="bgBackFileName"></span>
+          <button class="btn btn-remove" id="bgBackRemoveBtn" style="display:none" onclick="removeBgBack()">삭제</button>
+          <input type="file" id="bgBackFile" accept=".json" onchange="handleBgBackUpload(this)">
+        </div>
+        <div class="controls-body" id="bgBackControls">
+          <div class="pos-scale-row">
+            <div class="dpad">
+              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveBgBack(0,-1)">▲</button><div class="dpad-empty"></div>
+              <button class="dpad-btn" onclick="moveBgBack(-1,0)">◀</button><div class="dpad-btn dpad-center" id="bgBackPos">0,0</div><button class="dpad-btn" onclick="moveBgBack(1,0)">▶</button>
+              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveBgBack(0,1)">▼</button><div class="dpad-empty"></div>
+            </div>
+            <div class="sliders">
+              <div class="slider-row"><label>크기</label><input type="range" min="10" max="300" value="100" oninput="setBgBackScale(this.value)"><span class="val" id="bgBackScaleVal">100%</span></div>
+              <div class="slider-row"><label>X</label><input type="range" min="-150" max="150" value="0" id="bgBackRangeX" oninput="setBgBackPos('x',this.value)"><span class="val" id="bgBackXVal">0</span></div>
+              <div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" value="0" id="bgBackRangeY" oninput="setBgBackPos('y',this.value)"><span class="val" id="bgBackYVal">0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="keyboard-hint">💡 컨트롤 그룹 클릭 후 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 키로 위치 조절 · <kbd>Shift</kbd> 누르면 1px 단위</div>
       <button class="btn btn-download" id="downloadBtn" disabled onclick="downloadMerged()">📥 합쳐진 JSON 다운로드</button>
     </section>
@@ -409,6 +435,7 @@ TYPES.forEach(t => {
 });
 
 const bgElement = {data:null,x:0,y:0,scale:100,loaded:false};
+const bgBackElement = {data:null,x:0,y:0,scale:100,loaded:false};
 
 // ─── Keyframe Helpers ───
 function makeRotKf(pts) {
@@ -725,7 +752,7 @@ function renderPreview() {
   if (prevBlobUrl) { URL.revokeObjectURL(prevBlobUrl); prevBlobUrl = null; }
   if (!currentBaseData) return;
 
-  const hasOverlays = TYPES.some(t => elements[t].loaded) || bgElement.loaded;
+  const hasOverlays = TYPES.some(t => elements[t].loaded) || bgElement.loaded || bgBackElement.loaded;
   const animData = (hasOverlays || currentMotionId !== 'idle') ? buildMergedJson() : cloneJ(currentBaseData);
 
   const blob = new Blob([JSON.stringify(animData)], {type:'application/json'});
@@ -906,8 +933,77 @@ function removeBg() {
   updateDownloadBtn();
 }
 
+// ─── Back Background (behind stone) ───
+function handleBgBackUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.v || !data.layers) throw new Error('Invalid Lottie');
+      bgBackElement.data = data;
+      bgBackElement.loaded = true;
+      bgBackElement.x = 0; bgBackElement.y = 0; bgBackElement.scale = 100;
+      document.getElementById('bgBackFileName').textContent = file.name;
+      document.getElementById('bgBackStatus').textContent = '✓ 로드됨';
+      document.getElementById('bgBackRemoveBtn').style.display = '';
+      document.getElementById('bgBackControls').classList.add('visible');
+      resetBgBackSliders();
+      renderPreview();
+      setActive('bgBack');
+      updateDownloadBtn();
+    } catch(err) { alert('유효한 Lottie JSON 파일이 아닙니다: '+err.message); }
+  };
+  reader.readAsText(file);
+}
+function moveBgBack(dx,dy) {
+  if (!bgBackElement.loaded) return;
+  bgBackElement.x = Math.round(Math.max(-150,Math.min(150, bgBackElement.x+dx*stepSize)));
+  bgBackElement.y = Math.round(Math.max(-150,Math.min(150, bgBackElement.y+dy*stepSize)));
+  updateBgBackUI(); schedulePreviewRebuild();
+}
+function setBgBackPos(axis,val) {
+  if (!bgBackElement.loaded) return;
+  if (axis==='x') bgBackElement.x=parseInt(val); else bgBackElement.y=parseInt(val);
+  updateBgBackUI(); schedulePreviewRebuild();
+}
+function setBgBackScale(val) {
+  bgBackElement.scale=parseInt(val);
+  document.getElementById('bgBackScaleVal').textContent=bgBackElement.scale+'%';
+  if (bgBackElement.loaded) schedulePreviewRebuild();
+}
+function resetBgBackSliders() {
+  const sx=document.getElementById('bgBackRangeX'), sy=document.getElementById('bgBackRangeY');
+  if (sx) sx.value=bgBackElement.x; if (sy) sy.value=bgBackElement.y;
+  const ss=document.querySelector('[data-type="bgBack"] input[type="range"][max="300"]');
+  if (ss) ss.value=bgBackElement.scale;
+  updateBgBackUI();
+}
+function updateBgBackUI() {
+  document.getElementById('bgBackPos').textContent=`${bgBackElement.x},${bgBackElement.y}`;
+  document.getElementById('bgBackXVal').textContent=bgBackElement.x;
+  document.getElementById('bgBackYVal').textContent=bgBackElement.y;
+  document.getElementById('bgBackScaleVal').textContent=bgBackElement.scale+'%';
+  const sx=document.getElementById('bgBackRangeX'), sy=document.getElementById('bgBackRangeY');
+  if (sx) sx.value=bgBackElement.x; if (sy) sy.value=bgBackElement.y;
+}
+function removeBgBack() {
+  bgBackElement.data=null; bgBackElement.loaded=false;
+  bgBackElement.x=0; bgBackElement.y=0; bgBackElement.scale=100;
+  document.getElementById('bgBackFileName').textContent='';
+  document.getElementById('bgBackStatus').textContent='파일 없음';
+  document.getElementById('bgBackRemoveBtn').style.display='none';
+  document.getElementById('bgBackControls').classList.remove('visible');
+  document.getElementById('bgBackFile').value='';
+  resetBgBackSliders();
+  if (activeType==='bgBack') setActive(null);
+  renderPreview();
+  updateDownloadBtn();
+}
+
 function updateDownloadBtn() {
-  const anyElement = TYPES.some(t=>elements[t].loaded) || bgElement.loaded;
+  const anyElement = TYPES.some(t=>elements[t].loaded) || bgElement.loaded || bgBackElement.loaded;
   const hasMotion = currentMotionId !== 'idle';
   document.getElementById('downloadBtn').disabled = !(anyElement || hasMotion);
 }
@@ -1060,6 +1156,48 @@ function buildMergedJson() {
     merged.layers.unshift(bgLayer);
   }
 
+  if (bgBackElement.loaded && bgBackElement.data) {
+    const src = cloneJ(bgBackElement.data);
+    const prefix = 'bgb_';
+    const indOffset = 6000;
+    const assetIdMap = {};
+    (src.assets||[]).forEach(asset => {
+      const oldId=asset.id; const newId=prefix+oldId;
+      assetIdMap[oldId]=newId; asset.id=newId;
+      merged.assets.push(asset);
+    });
+    const processedLayers = src.layers.map(layer => {
+      const nl = cloneJ(layer);
+      if (nl.ind!==undefined) nl.ind+=indOffset;
+      if (nl.parent!==undefined) nl.parent+=indOffset;
+      if (nl.refId&&assetIdMap[nl.refId]) nl.refId=assetIdMap[nl.refId];
+      return nl;
+    });
+    const compId = prefix+'comp';
+    const bgbFr = src.fr || merged.fr;
+    merged.assets.push({id:compId,layers:processedLayers,w:src.w,h:src.h,nm:'bgback_composition',fr:bgbFr});
+    const ow=src.w, oh=src.h;
+    const coverRatio = Math.max(CANVAS_W/ow, CANVAS_H/oh);
+    const scaleX=coverRatio*bgBackElement.scale, scaleY=coverRatio*bgBackElement.scale;
+    const posX=CANVAS_W/2+bgBackElement.x, posY=CANVAS_H/2+bgBackElement.y;
+    const bgbLayer = {
+      ty:0, nm:'back_background', sr:1, st:merged.ip, op:merged.op, ip:merged.ip,
+      w:ow, h:oh, refId:compId, ind:48,
+      ks:{
+        a:{a:0,k:[ow/2,oh/2,0]},
+        s:{a:0,k:[scaleX,scaleY,100]},
+        p:{a:0,k:[posX,posY,0]},
+        r:{a:0,k:0},
+        o:{a:0,k:100}
+      }
+    };
+    const bgbInnerDurSec = (src.op-(src.ip||0)) / bgbFr;
+    const outerOp = merged.op-merged.ip;
+    const tm = createLoopTimeRemap(bgbInnerDurSec, outerOp, merged.fr);
+    if(tm) bgbLayer.tm=tm;
+    merged.layers.push(bgbLayer);
+  }
+
   return merged;
 }
 
@@ -1082,24 +1220,26 @@ document.querySelectorAll('.step-btn').forEach(btn => {
     stepSize = parseInt(btn.dataset.step);
   });
 });
+function isTypeLoaded(type) {
+  if (type==='background') return bgElement.loaded;
+  if (type==='bgBack') return bgBackElement.loaded;
+  return elements[type]?.loaded;
+}
 document.querySelectorAll('.control-group').forEach(group => {
   group.addEventListener('click', e => {
     if (e.target.closest('.btn')||e.target.closest('.dpad-btn')||e.target.tagName==='INPUT') return;
     const type=group.dataset.type;
-    const isLoaded = type==='background' ? bgElement.loaded : elements[type]?.loaded;
-    if (isLoaded) setActive(type);
+    if (isTypeLoaded(type)) setActive(type);
   });
   group.addEventListener('focus', () => {
     const type=group.dataset.type;
-    const isLoaded = type==='background' ? bgElement.loaded : elements[type]?.loaded;
-    if (isLoaded) setActive(type);
+    if (isTypeLoaded(type)) setActive(type);
   });
 });
 document.addEventListener('keydown', e => {
   if (!document.getElementById('tab-customizer').classList.contains('active')) return;
   if (!activeType) return;
-  const isLoaded = activeType==='background' ? bgElement.loaded : elements[activeType]?.loaded;
-  if (!isLoaded) return;
+  if (!isTypeLoaded(activeType)) return;
   if (e.target.tagName==='INPUT'&&e.target.type==='range') return;
   const s=e.shiftKey?1:stepSize;
   let dx=0,dy=0;
@@ -1110,6 +1250,7 @@ document.addEventListener('keydown', e => {
   e.preventDefault();
   const old=stepSize; stepSize=s;
   if (activeType==='background') moveBg(dx,dy);
+  else if (activeType==='bgBack') moveBgBack(dx,dy);
   else move(activeType,dx,dy);
   stepSize=old;
 });
