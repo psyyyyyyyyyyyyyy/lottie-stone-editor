@@ -1,1634 +1,2916 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>돌맹이 커스터마이저 | Weather Stone AI</title>
-<script type="module">
-import { DotLottie } from "https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web@0.69.0/+esm";
-window.__DotLottie = DotLottie;
-window.dispatchEvent(new Event('dotlottie-ready'));
-</script>
-<style>
-:root {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --surface-up: #21262d;
-  --border: #30363d;
-  --text: #f0f6fc;
-  --text-dim: #8b949e;
-  --accent: #58a6ff;
-  --eyes-color: #f97583;
-  --mouth-color: #79c0ff;
-  --acc-color: #d2a8ff;
-  --success: #56d364;
-  --danger: #f85149;
-  --radius: 12px;
-  --preview-size: 400px;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
-.app{max-width:1100px;margin:0 auto;padding:24px 20px 60px}
-.header{text-align:center;margin-bottom:28px}
-.header h1{font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--acc-color));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.header .subtitle{color:var(--text-dim);font-size:14px;margin-top:6px}
-.main{display:flex;gap:28px;align-items:flex-start}
-.preview-section{flex-shrink:0;position:sticky;top:24px}
-.preview-container{width:var(--preview-size);height:var(--preview-size);background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);position:relative;overflow:hidden}
-.lottie-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-.lottie-layer.overlay{transition:opacity .2s;pointer-events:none}
-.preview-info{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;color:var(--text-dim)}
-.controls-section{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>돌맹이 커스터마이저 | Weather Stone AI</title>
+    <script type="module">
+      import { DotLottie } from "https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web@0.69.0/+esm";
+      window.__DotLottie = DotLottie;
+      window.dispatchEvent(new Event("dotlottie-ready"));
+    </script>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --surface-up: #21262d;
+        --border: #30363d;
+        --text: #f0f6fc;
+        --text-dim: #8b949e;
+        --accent: #58a6ff;
+        --eyes-color: #f97583;
+        --mouth-color: #79c0ff;
+        --acc-color: #d2a8ff;
+        --success: #56d364;
+        --danger: #f85149;
+        --radius: 12px;
+        --preview-size: 400px;
+      }
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        line-height: 1.5;
+      }
+      .app {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 20px 60px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--accent), var(--acc-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .header .subtitle {
+        color: var(--text-dim);
+        font-size: 14px;
+        margin-top: 6px;
+      }
+      .main {
+        display: flex;
+        gap: 28px;
+        align-items: flex-start;
+      }
+      .preview-section {
+        flex-shrink: 0;
+        position: sticky;
+        top: 24px;
+      }
+      .preview-container {
+        width: var(--preview-size);
+        height: var(--preview-size);
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        position: relative;
+        overflow: hidden;
+      }
+      .lottie-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .lottie-layer.overlay {
+        transition: opacity 0.2s;
+        pointer-events: none;
+      }
+      .preview-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .controls-section {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
 
-/* Motion Selector */
-.motion-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
-.motion-section .sec-title{font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.motion-grid{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-.motion-grid::-webkit-scrollbar{height:4px}
-.motion-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.motion-card{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border:2px solid var(--border);border-radius:10px;background:var(--surface-up);cursor:pointer;transition:all .15s;min-width:68px;user-select:none}
-.motion-card:hover{border-color:var(--text-dim)}
-.motion-card.active{border-color:var(--accent);background:rgba(88,166,255,.1)}
-.motion-card .icon{font-size:20px;line-height:1.2}
-.motion-card .name{font-size:10px;color:var(--text-dim);white-space:nowrap}
-.motion-card.active .name{color:var(--text);font-weight:600}
-.motion-custom-upload{display:flex;align-items:center;gap:6px;margin-top:8px}
-.motion-custom-upload .file-name{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
+      /* Motion Selector */
+      .motion-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+      }
+      .motion-section .sec-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-dim);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .motion-grid {
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      .motion-grid::-webkit-scrollbar {
+        height: 4px;
+      }
+      .motion-grid::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+      .motion-card {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 8px 12px;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        background: var(--surface-up);
+        cursor: pointer;
+        transition: all 0.15s;
+        min-width: 68px;
+        user-select: none;
+      }
+      .motion-card:hover {
+        border-color: var(--text-dim);
+      }
+      .motion-card.active {
+        border-color: var(--accent);
+        background: rgba(88, 166, 255, 0.1);
+      }
+      .motion-card .icon {
+        font-size: 20px;
+        line-height: 1.2;
+      }
+      .motion-card .name {
+        font-size: 10px;
+        color: var(--text-dim);
+        white-space: nowrap;
+      }
+      .motion-card.active .name {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .motion-custom-upload {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .motion-custom-upload .file-name {
+        font-size: 11px;
+        color: var(--text-dim);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 160px;
+      }
 
-/* Control groups */
-.control-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color .2s}
-.control-group.active{border-color:var(--accent)}
-.control-group[data-type="bgBack"] .group-header .dot{background:#f0883e}
-.control-group[data-type="background"] .group-header .dot{background:var(--success)}
-.control-group[data-type="eyes"] .group-header .dot{background:var(--eyes-color)}
-.control-group[data-type="mouth"] .group-header .dot{background:var(--mouth-color)}
-.control-group[data-type="accessory"] .group-header .dot{background:var(--acc-color)}
-.group-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.group-header .dot{width:10px;height:10px;border-radius:50%}
-.group-header .label{font-weight:600;font-size:15px}
-.group-header .status{margin-left:auto;font-size:12px;color:var(--text-dim)}
-.upload-row{display:flex;gap:8px;align-items:center}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-up);color:var(--text);font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap}
-.btn:hover{background:var(--border)}
-.btn:active{transform:scale(.97)}
-.btn-sm{padding:5px 10px;font-size:11px}
-.btn-upload{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
-.btn-upload:hover{opacity:.85;background:var(--accent)}
-.btn-remove{border-color:var(--danger);color:var(--danger)}
-.btn-remove:hover{background:rgba(248,81,73,.15)}
-.btn-download{background:var(--success);border-color:var(--success);color:#000;font-weight:700;font-size:15px;padding:12px 24px;width:100%}
-.btn-download:hover{opacity:.85;background:var(--success)}
-.btn-download:disabled{opacity:.3;cursor:not-allowed}
-.file-name{font-size:12px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
-.controls-body{display:none;margin-top:14px;gap:14px;flex-direction:column}
-.controls-body.visible{display:flex}
-.pos-scale-row{display:flex;gap:16px;align-items:flex-start}
-.dpad{display:grid;grid-template-columns:36px 36px 36px;grid-template-rows:36px 36px 36px;gap:3px;flex-shrink:0}
-.dpad-btn{width:36px;height:36px;border:1px solid var(--border);border-radius:6px;background:var(--surface-up);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;font-family:inherit}
-.dpad-btn:hover{background:var(--border)}
-.dpad-btn:active{background:var(--accent);color:#000;transform:scale(.92)}
-.dpad-center{background:transparent;border:1px solid var(--border);cursor:default;font-size:11px;color:var(--text-dim)}
-.dpad-empty{visibility:hidden}
-.sliders{flex:1;display:flex;flex-direction:column;gap:10px}
-.slider-row{display:flex;align-items:center;gap:8px}
-.slider-row label{font-size:12px;color:var(--text-dim);width:38px;flex-shrink:0}
-.slider-row input[type="range"]{flex:1;accent-color:var(--accent);height:4px}
-.slider-row .val{font-size:12px;color:var(--text);width:54px;text-align:right;font-variant-numeric:tabular-nums}
-.step-selector{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
-.step-selector span{font-size:13px;color:var(--text-dim)}
-.step-btns{display:flex;gap:4px}
-.step-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-up);color:var(--text);font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
-.step-btn:hover{background:var(--border)}
-.step-btn.active{background:var(--accent);color:#000;border-color:var(--accent)}
-.keyboard-hint{font-size:11px;color:var(--text-dim);text-align:center;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
-.keyboard-hint kbd{background:var(--surface-up);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:11px;font-family:inherit}
-input[type="file"]{display:none}
+      /* Control groups */
+      .control-group {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        transition: border-color 0.2s;
+      }
+      .control-group.active {
+        border-color: var(--accent);
+      }
+      .control-group[data-type="bgBack"] .group-header .dot {
+        background: #f0883e;
+      }
+      .control-group[data-type="background"] .group-header .dot {
+        background: var(--success);
+      }
+      .control-group[data-type="eyes"] .group-header .dot {
+        background: var(--eyes-color);
+      }
+      .control-group[data-type="mouth"] .group-header .dot {
+        background: var(--mouth-color);
+      }
+      .control-group[data-type="accessory"] .group-header .dot {
+        background: var(--acc-color);
+      }
+      .group-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .group-header .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .group-header .label {
+        font-weight: 600;
+        font-size: 15px;
+      }
+      .group-header .status {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .upload-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface-up);
+        color: var(--text);
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        background: var(--border);
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .btn-sm {
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      .btn-upload {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #000;
+        font-weight: 600;
+      }
+      .btn-upload:hover {
+        opacity: 0.85;
+        background: var(--accent);
+      }
+      .btn-remove {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .btn-remove:hover {
+        background: rgba(248, 81, 73, 0.15);
+      }
+      .btn-download {
+        background: var(--success);
+        border-color: var(--success);
+        color: #000;
+        font-weight: 700;
+        font-size: 15px;
+        padding: 12px 24px;
+        width: 100%;
+      }
+      .btn-download:hover {
+        opacity: 0.85;
+        background: var(--success);
+      }
+      .btn-download:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      .file-name {
+        font-size: 12px;
+        color: var(--text-dim);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 140px;
+      }
+      .controls-body {
+        display: none;
+        margin-top: 14px;
+        gap: 14px;
+        flex-direction: column;
+      }
+      .controls-body.visible {
+        display: flex;
+      }
+      .pos-scale-row {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .dpad {
+        display: grid;
+        grid-template-columns: 36px 36px 36px;
+        grid-template-rows: 36px 36px 36px;
+        gap: 3px;
+        flex-shrink: 0;
+      }
+      .dpad-btn {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface-up);
+        color: var(--text);
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.1s;
+        font-family: inherit;
+      }
+      .dpad-btn:hover {
+        background: var(--border);
+      }
+      .dpad-btn:active {
+        background: var(--accent);
+        color: #000;
+        transform: scale(0.92);
+      }
+      .dpad-center {
+        background: transparent;
+        border: 1px solid var(--border);
+        cursor: default;
+        font-size: 11px;
+        color: var(--text-dim);
+      }
+      .dpad-empty {
+        visibility: hidden;
+      }
+      .sliders {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .slider-row label {
+        font-size: 12px;
+        color: var(--text-dim);
+        width: 38px;
+        flex-shrink: 0;
+      }
+      .slider-row input[type="range"] {
+        flex: 1;
+        accent-color: var(--accent);
+        height: 4px;
+      }
+      .slider-row .val {
+        font-size: 12px;
+        color: var(--text);
+        width: 54px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .step-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      .step-selector span {
+        font-size: 13px;
+        color: var(--text-dim);
+      }
+      .step-btns {
+        display: flex;
+        gap: 4px;
+      }
+      .step-btn {
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface-up);
+        color: var(--text);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .step-btn:hover {
+        background: var(--border);
+      }
+      .step-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+      }
+      .keyboard-hint {
+        font-size: 11px;
+        color: var(--text-dim);
+        text-align: center;
+        padding: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      .keyboard-hint kbd {
+        background: var(--surface-up);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 11px;
+        font-family: inherit;
+      }
+      input[type="file"] {
+        display: none;
+      }
 
-/* Tab Navigation */
-.tab-nav{display:flex;gap:4px;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px}
-.tab-btn{flex:1;padding:10px 16px;border:none;border-radius:8px;background:transparent;color:var(--text-dim);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
-.tab-btn:hover{color:var(--text);background:var(--surface-up)}
-.tab-btn.active{background:var(--accent);color:#000}
-.tab-content{display:none}
-.tab-content.active{display:block}
+      /* Tab Navigation */
+      .tab-nav {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 4px;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text-dim);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .tab-btn:hover {
+        color: var(--text);
+        background: var(--surface-up);
+      }
+      .tab-btn.active {
+        background: var(--accent);
+        color: #000;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
 
-/* Crop Tool */
-.crop-container{display:flex;gap:28px;align-items:flex-start}
-.crop-preview-section{flex-shrink:0;position:sticky;top:24px}
-.crop-preview{width:var(--preview-size);height:var(--preview-size);background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);position:relative;overflow:hidden}
-.crop-preview canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-.crop-guide{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;border:2px dashed rgba(88,166,255,.4);border-radius:2px;box-sizing:border-box}
-.crop-controls{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
-.crop-upload-area{background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius);padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .2s}
-.crop-upload-area:hover{border-color:var(--accent)}
-.crop-upload-area.has-file{border-style:solid;border-color:var(--success);cursor:default}
-.crop-upload-icon{font-size:36px;margin-bottom:8px}
-.crop-upload-text{color:var(--text-dim);font-size:13px}
-.crop-upload-text strong{color:var(--text)}
-.crop-file-info{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:none}
-.crop-file-info.visible{display:flex;align-items:center;gap:12px}
-.crop-file-info .info-text{flex:1;font-size:12px;color:var(--text-dim)}
-.crop-file-info .info-text strong{color:var(--text);display:block;font-size:14px;margin-bottom:2px}
-.crop-adjust{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:none}
-.crop-adjust.visible{display:block}
-.crop-adjust .sec-title{font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+      /* Customizer asset subtabs + slot cards */
+      .asset-subtab-nav {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 14px;
+        background: var(--surface-up);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 4px;
+      }
+      .asset-subtab-btn {
+        flex: 1;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--text-dim);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .asset-subtab-btn:hover {
+        color: var(--text);
+        background: var(--surface);
+      }
+      .asset-subtab-btn.active {
+        background: var(--accent);
+        color: #000;
+      }
+      .asset-subtab-panel {
+        display: none;
+      }
+      .asset-subtab-panel.active {
+        display: block;
+      }
+      .slot-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .face-block {
+        margin-bottom: 16px;
+      }
+      .face-block .face-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+      }
+      .upload-slot-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        transition: border-color 0.2s;
+      }
+      .upload-slot-card.active {
+        border-color: var(--accent);
+      }
+      .upload-slot-card .slot-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .upload-slot-card .slot-head .slot-label {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .upload-slot-card .slot-head .slot-status {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .upload-slot-card .slot-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .btn-add-slot {
+        min-width: 36px;
+        padding: 6px 10px;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .layer-order-hint {
+        font-size: 11px;
+        line-height: 1.55;
+        color: var(--text-dim);
+        background: var(--surface-up);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+      }
+      .layer-order-hint strong {
+        color: var(--text);
+        font-weight: 600;
+      }
 
-/* Gallery */
-.gallery-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
-.gallery-toolbar .count{margin-left:auto;font-size:12px;color:var(--text-dim)}
-.gallery-size-btns{display:flex;gap:4px}
-.gallery-size-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-up);color:var(--text);font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
-.gallery-size-btn:hover{background:var(--border)}
-.gallery-size-btn.active{background:var(--accent);color:#000;border-color:var(--accent)}
-.gallery-drop{background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:16px}
-.gallery-drop:hover{border-color:var(--accent)}
-.gallery-drop .drop-icon{font-size:32px;margin-bottom:6px}
-.gallery-drop .drop-text{color:var(--text-dim);font-size:13px}
-.gallery-drop .drop-text strong{color:var(--text)}
-.gallery-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(var(--gallery-card-size,180px),1fr))}
-.gallery-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;transition:border-color .2s}
-.gallery-card:hover{border-color:var(--text-dim)}
-.gallery-card canvas{width:100%;aspect-ratio:1;display:block;background:var(--surface)}
-.gallery-card .card-info{padding:8px 10px;display:flex;align-items:center;gap:6px}
-.gallery-card .card-name{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.gallery-card .card-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:background .15s;flex-shrink:0}
-.gallery-card .card-del:hover{background:rgba(248,81,73,.15)}
-.gallery-empty{text-align:center;padding:60px 20px;color:var(--text-dim);font-size:14px}
-.gallery-empty .empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+      /* Crop Tool */
+      .crop-container {
+        display: flex;
+        gap: 28px;
+        align-items: flex-start;
+      }
+      .crop-preview-section {
+        flex-shrink: 0;
+        position: sticky;
+        top: 24px;
+      }
+      .crop-preview {
+        width: var(--preview-size);
+        height: var(--preview-size);
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        position: relative;
+        overflow: hidden;
+      }
+      .crop-preview canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .crop-guide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border: 2px dashed rgba(88, 166, 255, 0.4);
+        border-radius: 2px;
+        box-sizing: border-box;
+      }
+      .crop-controls {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .crop-upload-area {
+        background: var(--surface);
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 40px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+      .crop-upload-area:hover {
+        border-color: var(--accent);
+      }
+      .crop-upload-area.has-file {
+        border-style: solid;
+        border-color: var(--success);
+        cursor: default;
+      }
+      .crop-upload-icon {
+        font-size: 36px;
+        margin-bottom: 8px;
+      }
+      .crop-upload-text {
+        color: var(--text-dim);
+        font-size: 13px;
+      }
+      .crop-upload-text strong {
+        color: var(--text);
+      }
+      .crop-file-info {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        display: none;
+      }
+      .crop-file-info.visible {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .crop-file-info .info-text {
+        flex: 1;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .crop-file-info .info-text strong {
+        color: var(--text);
+        display: block;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      .crop-adjust {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        display: none;
+      }
+      .crop-adjust.visible {
+        display: block;
+      }
+      .crop-adjust .sec-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-dim);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
 
-@media(max-width:780px){.main{flex-direction:column;align-items:center}.preview-section{position:static}.crop-container{flex-direction:column;align-items:center}.crop-preview-section{position:static}:root{--preview-size:min(90vw,400px)}}
-</style>
-</head>
-<body>
-<div class="app">
-  <header class="header">
-    <h1>🪨 돌맹이 커스터마이저</h1>
-    <p class="subtitle" id="headerSubtitle">움직임을 선택하고, 눈·입·악세서리를 올려 나만의 돌맹이를 만들어보세요</p>
-  </header>
-  <nav class="tab-nav">
-    <button class="tab-btn active" data-tab="customizer" onclick="switchTab('customizer')">🎨 커스터마이저</button>
-    <button class="tab-btn" data-tab="crop" onclick="switchTab('crop')">✂️ Lottie 자르기</button>
-    <button class="tab-btn" data-tab="gallery" onclick="switchTab('gallery')">🖼️ 갤러리</button>
-  </nav>
+      /* Gallery */
+      .gallery-toolbar {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .gallery-toolbar .count {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .gallery-size-btns {
+        display: flex;
+        gap: 4px;
+      }
+      .gallery-size-btn {
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface-up);
+        color: var(--text);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .gallery-size-btn:hover {
+        background: var(--border);
+      }
+      .gallery-size-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+      }
+      .gallery-drop {
+        background: var(--surface);
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 32px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        margin-bottom: 16px;
+      }
+      .gallery-drop:hover {
+        border-color: var(--accent);
+      }
+      .gallery-drop .drop-icon {
+        font-size: 32px;
+        margin-bottom: 6px;
+      }
+      .gallery-drop .drop-text {
+        color: var(--text-dim);
+        font-size: 13px;
+      }
+      .gallery-drop .drop-text strong {
+        color: var(--text);
+      }
+      .gallery-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(
+          auto-fill,
+          minmax(var(--gallery-card-size, 180px), 1fr)
+        );
+      }
+      .gallery-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        position: relative;
+        transition: border-color 0.2s;
+      }
+      .gallery-card:hover {
+        border-color: var(--text-dim);
+      }
+      .gallery-card canvas {
+        width: 100%;
+        aspect-ratio: 1;
+        display: block;
+        background: var(--surface);
+      }
+      .gallery-card .card-info {
+        padding: 8px 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .gallery-card .card-name {
+        font-size: 11px;
+        color: var(--text-dim);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
+      .gallery-card .card-del {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: background 0.15s;
+        flex-shrink: 0;
+      }
+      .gallery-card .card-del:hover {
+        background: rgba(248, 81, 73, 0.15);
+      }
+      .gallery-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-dim);
+        font-size: 14px;
+      }
+      .gallery-empty .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
 
-  <div class="tab-content active" id="tab-customizer">
-  <main class="main">
-    <section class="preview-section">
-      <div class="preview-container" id="previewContainer">
-        <canvas class="lottie-layer" id="baseCanvas" width="800" height="800"></canvas>
-      </div>
-      <div class="preview-info">
-        <span id="motionLabel">움직임: 기본</span>
-        <span id="activeInfo">선택: 없음</span>
-      </div>
-    </section>
-    <section class="controls-section">
+      @media (max-width: 780px) {
+        .main {
+          flex-direction: column;
+          align-items: center;
+        }
+        .preview-section {
+          position: static;
+        }
+        .crop-container {
+          flex-direction: column;
+          align-items: center;
+        }
+        .crop-preview-section {
+          position: static;
+        }
+        :root {
+          --preview-size: min(90vw, 400px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <h1>🪨 돌맹이 커스터마이저</h1>
+        <p class="subtitle" id="headerSubtitle">
+          움직임을 선택하고, 눈·입·악세서리를 올려 나만의 돌맹이를 만들어보세요
+        </p>
+      </header>
+      <nav class="tab-nav">
+        <button
+          class="tab-btn active"
+          data-tab="customizer"
+          onclick="switchTab('customizer')"
+        >
+          🎨 커스터마이저
+        </button>
+        <button class="tab-btn" data-tab="crop" onclick="switchTab('crop')">
+          ✂️ Lottie 자르기
+        </button>
+        <button
+          class="tab-btn"
+          data-tab="gallery"
+          onclick="switchTab('gallery')"
+        >
+          🖼️ 갤러리
+        </button>
+      </nav>
 
-      <!-- Motion Selector -->
-      <div class="motion-section">
-        <div class="sec-title">🎬 움직임 선택</div>
-        <div class="motion-grid" id="motionGrid"></div>
-        <div class="motion-custom-upload">
-          <button class="btn btn-sm" onclick="document.getElementById('motionFile').click()">직접 업로드</button>
-          <span class="file-name" id="motionFileName"></span>
-          <input type="file" id="motionFile" accept=".json" onchange="handleMotionUpload(this)">
-        </div>
-      </div>
-
-      <div class="step-selector">
-        <span>이동 단위:</span>
-        <div class="step-btns">
-          <button class="step-btn" data-step="1">1px</button>
-          <button class="step-btn active" data-step="3">3px</button>
-          <button class="step-btn" data-step="5">5px</button>
-          <button class="step-btn" data-step="10">10px</button>
-        </div>
-      </div>
-
-      <!-- Background (front overlay, independent of stone movement) -->
-      <div class="control-group" data-type="background" tabindex="0">
-        <div class="group-header"><div class="dot"></div><span class="label">🌄 배경</span><span class="status" id="backgroundStatus">파일 없음</span></div>
-        <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('background')">파일 선택</button>
-          <span class="file-name" id="backgroundFileName"></span>
-          <button class="btn btn-remove" id="backgroundRemoveBtn" style="display:none" onclick="removeBg()">삭제</button>
-          <input type="file" id="backgroundFile" accept=".json,.png,.jpg,.jpeg" onchange="handleBgUpload(this)">
-        </div>
-        <div class="controls-body" id="backgroundControls">
-          <div class="pos-scale-row">
-            <div class="dpad">
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveBg(0,-1)">▲</button><div class="dpad-empty"></div>
-              <button class="dpad-btn" onclick="moveBg(-1,0)">◀</button><div class="dpad-btn dpad-center" id="backgroundPos">0,0</div><button class="dpad-btn" onclick="moveBg(1,0)">▶</button>
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveBg(0,1)">▼</button><div class="dpad-empty"></div>
+      <div class="tab-content active" id="tab-customizer">
+        <main class="main">
+          <section class="preview-section">
+            <div class="preview-container" id="previewContainer">
+              <canvas
+                class="lottie-layer"
+                id="baseCanvas"
+                width="800"
+                height="800"
+              ></canvas>
             </div>
-            <div class="sliders">
-              <div class="slider-row"><label>크기</label><input type="range" min="10" max="300" value="100" oninput="setBgScale(this.value)"><span class="val" id="backgroundScaleVal">100%</span></div>
-              <div class="slider-row"><label>X</label><input type="range" min="-150" max="150" value="0" id="backgroundRangeX" oninput="setBgPos('x',this.value)"><span class="val" id="backgroundXVal">0</span></div>
-              <div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" value="0" id="backgroundRangeY" oninput="setBgPos('y',this.value)"><span class="val" id="backgroundYVal">0</span></div>
+            <div class="preview-info">
+              <span id="motionLabel">움직임: 기본</span>
+              <span id="activeInfo">선택: 없음</span>
             </div>
+          </section>
+          <section class="controls-section">
+            <!-- Motion Selector -->
+            <div class="motion-section">
+              <div class="sec-title">🎬 움직임 선택</div>
+              <div class="motion-grid" id="motionGrid"></div>
+              <div class="motion-custom-upload">
+                <button
+                  class="btn btn-sm"
+                  onclick="document.getElementById('motionFile').click()"
+                >
+                  직접 업로드
+                </button>
+                <span class="file-name" id="motionFileName"></span>
+                <input
+                  type="file"
+                  id="motionFile"
+                  accept=".json"
+                  onchange="handleMotionUpload(this)"
+                />
+              </div>
+            </div>
+
+            <div class="step-selector">
+              <span>이동 단위:</span>
+              <div class="step-btns">
+                <button class="step-btn" data-step="1">1px</button>
+                <button class="step-btn active" data-step="3">3px</button>
+                <button class="step-btn" data-step="5">5px</button>
+                <button class="step-btn" data-step="10">10px</button>
+              </div>
+            </div>
+
+            <!-- 배경 / 뒷배경 / 눈·입·악세서리 (동적 슬롯 카드) -->
+            <div class="asset-asset-panel">
+              <nav class="asset-subtab-nav" aria-label="요소 탭">
+                <button
+                  type="button"
+                  class="asset-subtab-btn active"
+                  data-asset-panel="background"
+                  onclick="switchAssetPanel('background')"
+                >
+                  🌄 배경
+                </button>
+                <button
+                  type="button"
+                  class="asset-subtab-btn"
+                  data-asset-panel="bgBack"
+                  onclick="switchAssetPanel('bgBack')"
+                >
+                  🎑 뒷배경
+                </button>
+                <button
+                  type="button"
+                  class="asset-subtab-btn"
+                  data-asset-panel="face"
+                  onclick="switchAssetPanel('face')"
+                >
+                  👀 눈·👄 입·🎩 악세서리
+                </button>
+              </nav>
+              <p class="layer-order-hint" role="note">
+                <strong>쌓임 순서</strong> (화면에서 앞쪽 → 뒤쪽)<br />
+                · <strong>배경</strong> (돌 앞): 카드 <strong>#이 클수록 더 뒤</strong>. #1이 가장 앞.<br />
+                · <strong>뒷배경</strong> (돌 뒤): 카드 <strong>#이 클수록 더 뒤</strong>. #1이 돌에 더 가깝게 깔림.<br />
+                · <strong>눈 / 입</strong>: 각각 <strong>#이 클수록 더 앞</strong>. 종류끼리는
+                <strong>입이 눈보다 앞</strong>.<br />
+                · <strong>악세서리</strong>: <strong>#이 클수록 더 앞</strong>. 전체 표정 레이어 중
+                <strong>악세서리 → 입 → 눈</strong> 순(악세서리가 가장 앞).
+              </p>
+              <div
+                id="asset-panel-background"
+                class="asset-subtab-panel active"
+              >
+                <div class="slot-list" id="slotList-background"></div>
+              </div>
+              <div id="asset-panel-bgBack" class="asset-subtab-panel">
+                <div class="slot-list" id="slotList-bgBack"></div>
+              </div>
+              <div id="asset-panel-face" class="asset-subtab-panel">
+                <div class="face-block">
+                  <div class="face-title">👀 눈</div>
+                  <div class="slot-list" id="slotList-eyes"></div>
+                </div>
+                <div class="face-block">
+                  <div class="face-title">👄 입</div>
+                  <div class="slot-list" id="slotList-mouth"></div>
+                </div>
+                <div class="face-block">
+                  <div class="face-title">🎩 악세서리</div>
+                  <div class="slot-list" id="slotList-accessory"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="keyboard-hint">
+              💡 카드(슬롯)를 클릭한 뒤 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd
+              ><kbd>→</kbd> 키로 위치 조절 · <kbd>Shift</kbd> 누르면 1px 단위
+            </div>
+            <button
+              class="btn btn-download"
+              id="downloadBtn"
+              disabled
+              onclick="downloadMerged()"
+            >
+              📥 합쳐진 JSON 다운로드
+            </button>
+          </section>
+        </main>
+      </div>
+      <!-- /tab-customizer -->
+
+      <div class="tab-content" id="tab-crop" tabindex="0">
+        <div class="crop-container">
+          <section class="crop-preview-section">
+            <div class="crop-preview">
+              <canvas id="cropCanvas" width="800" height="800"></canvas>
+              <div class="crop-guide"></div>
+            </div>
+            <div class="preview-info">
+              <span id="cropSizeLabel">300 × 300</span>
+              <span id="cropOrigSize">원본: -</span>
+            </div>
+          </section>
+          <section class="crop-controls">
+            <div
+              class="crop-upload-area"
+              id="cropUploadArea"
+              onclick="document.getElementById('cropFileInput').click()"
+            >
+              <div class="crop-upload-icon">📂</div>
+              <div class="crop-upload-text">
+                <strong>Lottie JSON 파일 업로드</strong><br />완성된 Lottie
+                파일을 여기에 드롭하거나 클릭하세요
+              </div>
+              <input
+                type="file"
+                id="cropFileInput"
+                accept=".json"
+                onchange="handleCropUpload(this)"
+              />
+            </div>
+
+            <div class="crop-file-info" id="cropFileInfo">
+              <div class="info-text">
+                <strong id="cropFileName">-</strong
+                ><span id="cropFileDetail">-</span>
+              </div>
+              <button class="btn btn-remove" onclick="removeCropFile()">
+                삭제
+              </button>
+            </div>
+
+            <div class="crop-adjust" id="cropAdjust">
+              <div class="sec-title">📐 크기 및 위치 조절</div>
+              <div class="pos-scale-row">
+                <div class="dpad">
+                  <div class="dpad-empty"></div>
+                  <button class="dpad-btn" onclick="moveCrop(0, -1)">▲</button>
+                  <div class="dpad-empty"></div>
+                  <button class="dpad-btn" onclick="moveCrop(-1, 0)">◀</button>
+                  <div class="dpad-btn dpad-center" id="cropPos">0,0</div>
+                  <button class="dpad-btn" onclick="moveCrop(1, 0)">▶</button>
+                  <div class="dpad-empty"></div>
+                  <button class="dpad-btn" onclick="moveCrop(0, 1)">▼</button>
+                  <div class="dpad-empty"></div>
+                </div>
+                <div class="sliders">
+                  <div class="slider-row">
+                    <label>크기</label
+                    ><input
+                      type="range"
+                      min="10"
+                      max="500"
+                      value="100"
+                      id="cropScaleRange"
+                      oninput="setCropScale(this.value)"
+                    /><span class="val" id="cropScaleVal">100%</span>
+                  </div>
+                  <div class="slider-row">
+                    <label>X</label
+                    ><input
+                      type="range"
+                      min="-500"
+                      max="500"
+                      value="0"
+                      id="cropRangeX"
+                      oninput="setCropPos('x', this.value)"
+                    /><span class="val" id="cropXVal">0</span>
+                  </div>
+                  <div class="slider-row">
+                    <label>Y</label
+                    ><input
+                      type="range"
+                      min="-500"
+                      max="500"
+                      value="0"
+                      id="cropRangeY"
+                      oninput="setCropPos('y', this.value)"
+                    /><span class="val" id="cropYVal">0</span>
+                  </div>
+                </div>
+              </div>
+              <div class="step-selector" style="margin-top: 14px">
+                <span>이동 단위:</span>
+                <div class="step-btns">
+                  <button class="step-btn" data-cropstep="1">1px</button>
+                  <button class="step-btn active" data-cropstep="3">3px</button>
+                  <button class="step-btn" data-cropstep="5">5px</button>
+                  <button class="step-btn" data-cropstep="10">10px</button>
+                </div>
+              </div>
+              <div class="keyboard-hint" style="margin-top: 14px">
+                💡 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 키로 위치
+                조절 · <kbd>Shift</kbd> 누르면 1px 단위
+              </div>
+            </div>
+
+            <button
+              class="btn btn-download"
+              id="cropDownloadBtn"
+              disabled
+              onclick="downloadCropped()"
+            >
+              📥 300×300 JSON 다운로드
+            </button>
+          </section>
+        </div>
+      </div>
+      <!-- /tab-crop -->
+
+      <div class="tab-content" id="tab-gallery">
+        <div class="gallery-toolbar">
+          <button
+            class="btn btn-upload"
+            onclick="document.getElementById('galleryFileInput').click()"
+          >
+            📂 파일 추가
+          </button>
+          <button
+            class="btn btn-remove"
+            id="galleryClearBtn"
+            style="display: none"
+            onclick="clearGallery()"
+          >
+            전체 삭제
+          </button>
+          <input
+            type="file"
+            id="galleryFileInput"
+            accept=".json"
+            multiple
+            onchange="handleGalleryUpload(this)"
+          />
+          <div class="gallery-size-btns">
+            <button
+              class="gallery-size-btn"
+              data-gsize="120"
+              onclick="setGallerySize(120, this)"
+            >
+              S
+            </button>
+            <button
+              class="gallery-size-btn active"
+              data-gsize="180"
+              onclick="setGallerySize(180, this)"
+            >
+              M
+            </button>
+            <button
+              class="gallery-size-btn"
+              data-gsize="260"
+              onclick="setGallerySize(260, this)"
+            >
+              L
+            </button>
+          </div>
+          <span class="count" id="galleryCount">0개</span>
+        </div>
+        <div
+          class="gallery-drop"
+          id="galleryDrop"
+          onclick="document.getElementById('galleryFileInput').click()"
+        >
+          <div class="drop-icon">📂</div>
+          <div class="drop-text">
+            <strong>Lottie JSON 파일을 드래그하거나 클릭</strong><br />여러
+            파일을 한 번에 올릴 수 있습니다
           </div>
         </div>
-      </div>
-
-      <!-- Eyes -->
-      <div class="control-group" data-type="eyes" tabindex="0">
-        <div class="group-header"><div class="dot"></div><span class="label">👀 눈</span><span class="status" id="eyesStatus">파일 없음</span></div>
-        <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('eyes')">파일 선택</button>
-          <span class="file-name" id="eyesFileName"></span>
-          <button class="btn btn-remove" id="eyesRemoveBtn" style="display:none" onclick="removeElement('eyes')">삭제</button>
-          <input type="file" id="eyesFile" accept=".json,.png,.jpg,.jpeg" onchange="handleUpload('eyes',this)">
-        </div>
-        <div class="controls-body" id="eyesControls">
-          <div class="pos-scale-row">
-            <div class="dpad">
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="move('eyes',0,-1)">▲</button><div class="dpad-empty"></div>
-              <button class="dpad-btn" onclick="move('eyes',-1,0)">◀</button><div class="dpad-btn dpad-center" id="eyesPos">0,0</div><button class="dpad-btn" onclick="move('eyes',1,0)">▶</button>
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="move('eyes',0,1)">▼</button><div class="dpad-empty"></div>
-            </div>
-            <div class="sliders">
-              <div class="slider-row"><label>크기</label><input type="range" min="10" max="300" value="100" oninput="setScale('eyes',this.value)"><span class="val" id="eyesScaleVal">100%</span></div>
-              <div class="slider-row"><label>X</label><input type="range" min="-150" max="150" value="0" id="eyesRangeX" oninput="setPos('eyes','x',this.value)"><span class="val" id="eyesXVal">0</span></div>
-              <div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" value="0" id="eyesRangeY" oninput="setPos('eyes','y',this.value)"><span class="val" id="eyesYVal">0</span></div>
-            </div>
-          </div>
+        <div class="gallery-grid" id="galleryGrid"></div>
+        <div class="gallery-empty" id="galleryEmpty">
+          <div class="empty-icon">🖼️</div>
+          파일을 업로드하면 여기에 미리보기가 표시됩니다
         </div>
       </div>
-
-      <!-- Mouth -->
-      <div class="control-group" data-type="mouth" tabindex="0">
-        <div class="group-header"><div class="dot"></div><span class="label">👄 입</span><span class="status" id="mouthStatus">파일 없음</span></div>
-        <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('mouth')">파일 선택</button>
-          <span class="file-name" id="mouthFileName"></span>
-          <button class="btn btn-remove" id="mouthRemoveBtn" style="display:none" onclick="removeElement('mouth')">삭제</button>
-          <input type="file" id="mouthFile" accept=".json,.png,.jpg,.jpeg" onchange="handleUpload('mouth',this)">
-        </div>
-        <div class="controls-body" id="mouthControls">
-          <div class="pos-scale-row">
-            <div class="dpad">
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="move('mouth',0,-1)">▲</button><div class="dpad-empty"></div>
-              <button class="dpad-btn" onclick="move('mouth',-1,0)">◀</button><div class="dpad-btn dpad-center" id="mouthPos">0,0</div><button class="dpad-btn" onclick="move('mouth',1,0)">▶</button>
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="move('mouth',0,1)">▼</button><div class="dpad-empty"></div>
-            </div>
-            <div class="sliders">
-              <div class="slider-row"><label>크기</label><input type="range" min="10" max="300" value="100" oninput="setScale('mouth',this.value)"><span class="val" id="mouthScaleVal">100%</span></div>
-              <div class="slider-row"><label>X</label><input type="range" min="-150" max="150" value="0" id="mouthRangeX" oninput="setPos('mouth','x',this.value)"><span class="val" id="mouthXVal">0</span></div>
-              <div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" value="0" id="mouthRangeY" oninput="setPos('mouth','y',this.value)"><span class="val" id="mouthYVal">0</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Accessory -->
-      <div class="control-group" data-type="accessory" tabindex="0">
-        <div class="group-header"><div class="dot"></div><span class="label">🎩 악세서리</span><span class="status" id="accessoryStatus">파일 없음</span></div>
-        <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('accessory')">파일 선택</button>
-          <span class="file-name" id="accessoryFileName"></span>
-          <button class="btn btn-remove" id="accessoryRemoveBtn" style="display:none" onclick="removeElement('accessory')">삭제</button>
-          <input type="file" id="accessoryFile" accept=".json,.png,.jpg,.jpeg" onchange="handleUpload('accessory',this)">
-        </div>
-        <div class="controls-body" id="accessoryControls">
-          <div class="pos-scale-row">
-            <div class="dpad">
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="move('accessory',0,-1)">▲</button><div class="dpad-empty"></div>
-              <button class="dpad-btn" onclick="move('accessory',-1,0)">◀</button><div class="dpad-btn dpad-center" id="accessoryPos">0,0</div><button class="dpad-btn" onclick="move('accessory',1,0)">▶</button>
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="move('accessory',0,1)">▼</button><div class="dpad-empty"></div>
-            </div>
-            <div class="sliders">
-              <div class="slider-row"><label>크기</label><input type="range" min="10" max="300" value="100" oninput="setScale('accessory',this.value)"><span class="val" id="accessoryScaleVal">100%</span></div>
-              <div class="slider-row"><label>X</label><input type="range" min="-150" max="150" value="0" id="accessoryRangeX" oninput="setPos('accessory','x',this.value)"><span class="val" id="accessoryXVal">0</span></div>
-              <div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" value="0" id="accessoryRangeY" oninput="setPos('accessory','y',this.value)"><span class="val" id="accessoryYVal">0</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Back Background (behind stone) -->
-      <div class="control-group" data-type="bgBack" tabindex="0">
-        <div class="group-header"><div class="dot"></div><span class="label">🎑 뒷배경</span><span class="status" id="bgBackStatus">파일 없음</span></div>
-        <div class="upload-row">
-          <button class="btn btn-upload" onclick="document.getElementById('bgBackFile').click()">파일 선택</button>
-          <span class="file-name" id="bgBackFileName"></span>
-          <button class="btn btn-remove" id="bgBackRemoveBtn" style="display:none" onclick="removeBgBack()">삭제</button>
-          <input type="file" id="bgBackFile" accept=".json,.png,.jpg,.jpeg" onchange="handleBgBackUpload(this)">
-        </div>
-        <div class="controls-body" id="bgBackControls">
-          <div class="pos-scale-row">
-            <div class="dpad">
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveBgBack(0,-1)">▲</button><div class="dpad-empty"></div>
-              <button class="dpad-btn" onclick="moveBgBack(-1,0)">◀</button><div class="dpad-btn dpad-center" id="bgBackPos">0,0</div><button class="dpad-btn" onclick="moveBgBack(1,0)">▶</button>
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveBgBack(0,1)">▼</button><div class="dpad-empty"></div>
-            </div>
-            <div class="sliders">
-              <div class="slider-row"><label>크기</label><input type="range" min="10" max="300" value="100" oninput="setBgBackScale(this.value)"><span class="val" id="bgBackScaleVal">100%</span></div>
-              <div class="slider-row"><label>X</label><input type="range" min="-150" max="150" value="0" id="bgBackRangeX" oninput="setBgBackPos('x',this.value)"><span class="val" id="bgBackXVal">0</span></div>
-              <div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" value="0" id="bgBackRangeY" oninput="setBgBackPos('y',this.value)"><span class="val" id="bgBackYVal">0</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="keyboard-hint">💡 컨트롤 그룹 클릭 후 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 키로 위치 조절 · <kbd>Shift</kbd> 누르면 1px 단위</div>
-      <button class="btn btn-download" id="downloadBtn" disabled onclick="downloadMerged()">📥 합쳐진 JSON 다운로드</button>
-    </section>
-  </main>
-  </div><!-- /tab-customizer -->
-
-  <div class="tab-content" id="tab-crop" tabindex="0">
-    <div class="crop-container">
-      <section class="crop-preview-section">
-        <div class="crop-preview">
-          <canvas id="cropCanvas" width="800" height="800"></canvas>
-          <div class="crop-guide"></div>
-        </div>
-        <div class="preview-info">
-          <span id="cropSizeLabel">300 × 300</span>
-          <span id="cropOrigSize">원본: -</span>
-        </div>
-      </section>
-      <section class="crop-controls">
-        <div class="crop-upload-area" id="cropUploadArea" onclick="document.getElementById('cropFileInput').click()">
-          <div class="crop-upload-icon">📂</div>
-          <div class="crop-upload-text"><strong>Lottie JSON 파일 업로드</strong><br>완성된 Lottie 파일을 여기에 드롭하거나 클릭하세요</div>
-          <input type="file" id="cropFileInput" accept=".json" onchange="handleCropUpload(this)">
-        </div>
-
-        <div class="crop-file-info" id="cropFileInfo">
-          <div class="info-text"><strong id="cropFileName">-</strong><span id="cropFileDetail">-</span></div>
-          <button class="btn btn-remove" onclick="removeCropFile()">삭제</button>
-        </div>
-
-        <div class="crop-adjust" id="cropAdjust">
-          <div class="sec-title">📐 크기 및 위치 조절</div>
-          <div class="pos-scale-row">
-            <div class="dpad">
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveCrop(0,-1)">▲</button><div class="dpad-empty"></div>
-              <button class="dpad-btn" onclick="moveCrop(-1,0)">◀</button><div class="dpad-btn dpad-center" id="cropPos">0,0</div><button class="dpad-btn" onclick="moveCrop(1,0)">▶</button>
-              <div class="dpad-empty"></div><button class="dpad-btn" onclick="moveCrop(0,1)">▼</button><div class="dpad-empty"></div>
-            </div>
-            <div class="sliders">
-              <div class="slider-row"><label>크기</label><input type="range" min="10" max="500" value="100" id="cropScaleRange" oninput="setCropScale(this.value)"><span class="val" id="cropScaleVal">100%</span></div>
-              <div class="slider-row"><label>X</label><input type="range" min="-500" max="500" value="0" id="cropRangeX" oninput="setCropPos('x',this.value)"><span class="val" id="cropXVal">0</span></div>
-              <div class="slider-row"><label>Y</label><input type="range" min="-500" max="500" value="0" id="cropRangeY" oninput="setCropPos('y',this.value)"><span class="val" id="cropYVal">0</span></div>
-            </div>
-          </div>
-          <div class="step-selector" style="margin-top:14px">
-            <span>이동 단위:</span>
-            <div class="step-btns">
-              <button class="step-btn" data-cropstep="1">1px</button>
-              <button class="step-btn active" data-cropstep="3">3px</button>
-              <button class="step-btn" data-cropstep="5">5px</button>
-              <button class="step-btn" data-cropstep="10">10px</button>
-            </div>
-          </div>
-          <div class="keyboard-hint" style="margin-top:14px">💡 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 키로 위치 조절 · <kbd>Shift</kbd> 누르면 1px 단위</div>
-        </div>
-
-        <button class="btn btn-download" id="cropDownloadBtn" disabled onclick="downloadCropped()">📥 300×300 JSON 다운로드</button>
-      </section>
+      <!-- /tab-gallery -->
     </div>
-  </div><!-- /tab-crop -->
 
-  <div class="tab-content" id="tab-gallery">
-    <div class="gallery-toolbar">
-      <button class="btn btn-upload" onclick="document.getElementById('galleryFileInput').click()">📂 파일 추가</button>
-      <button class="btn btn-remove" id="galleryClearBtn" style="display:none" onclick="clearGallery()">전체 삭제</button>
-      <input type="file" id="galleryFileInput" accept=".json" multiple onchange="handleGalleryUpload(this)">
-      <div class="gallery-size-btns">
-        <button class="gallery-size-btn" data-gsize="120" onclick="setGallerySize(120,this)">S</button>
-        <button class="gallery-size-btn active" data-gsize="180" onclick="setGallerySize(180,this)">M</button>
-        <button class="gallery-size-btn" data-gsize="260" onclick="setGallerySize(260,this)">L</button>
-      </div>
-      <span class="count" id="galleryCount">0개</span>
-    </div>
-    <div class="gallery-drop" id="galleryDrop" onclick="document.getElementById('galleryFileInput').click()">
-      <div class="drop-icon">📂</div>
-      <div class="drop-text"><strong>Lottie JSON 파일을 드래그하거나 클릭</strong><br>여러 파일을 한 번에 올릴 수 있습니다</div>
-    </div>
-    <div class="gallery-grid" id="galleryGrid"></div>
-    <div class="gallery-empty" id="galleryEmpty">
-      <div class="empty-icon">🖼️</div>
-      파일을 업로드하면 여기에 미리보기가 표시됩니다
-    </div>
-  </div><!-- /tab-gallery -->
-</div>
+    <script>
+      const CANVAS_W = 300,
+        CANVAS_H = 300;
+      const TYPES = ["eyes", "mouth", "accessory"];
+      const DEFAULT_OFFSETS = {
+        eyes: { x: 0, y: -20 },
+        mouth: { x: 0, y: 20 },
+        accessory: { x: 0, y: -60 },
+      };
 
-<script>
-const CANVAS_W = 300, CANVAS_H = 300;
-const TYPES = ['eyes','mouth','accessory'];
-const DEFAULT_OFFSETS = {eyes:{x:0,y:-20},mouth:{x:0,y:20},accessory:{x:0,y:-60}};
+      let stepSize = 3;
+      let activeSlotCategory = null;
+      let activeSlotId = null;
+      let originalBaseData = null;
+      let currentBaseData = null;
+      let currentMotionId = "idle";
+      let baseAnimation = null;
+      let prevBlobUrl = null;
+      let previewTimer = null;
 
-let stepSize = 3;
-let activeType = null;
-let originalBaseData = null;
-let currentBaseData = null;
-let currentMotionId = 'idle';
-let baseAnimation = null;
-let prevBlobUrl = null;
-let previewTimer = null;
+      const SLOT_CATS = ["background", "bgBack", ...TYPES];
 
-const elements = {};
-TYPES.forEach(t => {
-  elements[t] = {data:null,x:DEFAULT_OFFSETS[t].x,y:DEFAULT_OFFSETS[t].y,scale:100,loaded:false};
-});
-
-const bgElement = {data:null,x:0,y:0,scale:100,loaded:false};
-const bgBackElement = {data:null,x:0,y:0,scale:100,loaded:false};
-
-// ─── Keyframe Helpers ───
-function makeRotKf(pts) {
-  return {a:1, k: pts.map((p,i) => {
-    const kf = {t:p[0], s:[p[1]]};
-    if (i < pts.length-1) { kf.o={x:0.33,y:0}; kf.i={x:0.67,y:1}; }
-    return kf;
-  })};
-}
-function makePosKf(pts) {
-  return {a:1, k: pts.map((p,i) => {
-    const kf = {t:p[0], s:p[1]};
-    if (i < pts.length-1) { kf.o={x:0.33,y:0}; kf.i={x:0.67,y:1}; kf.to=[0,0,0]; kf.ti=[0,0,0]; }
-    return kf;
-  })};
-}
-function makeScaleKf(pts) {
-  return {a:1, k: pts.map((p,i) => {
-    const kf = {t:p[0], s:p[1]};
-    if (i < pts.length-1) { kf.o={x:[0.33,0.33,0.33],y:[0,0,0]}; kf.i={x:[0.67,0.67,0.67],y:[1,1,1]}; }
-    return kf;
-  })};
-}
-function findLayer(data, nm) { return data.layers.find(l => l.nm === nm); }
-function cloneJ(o) { return JSON.parse(JSON.stringify(o)); }
-
-// ─── Stone Layer Helpers (for parenting overlays to stone movement) ───
-function getRestValue(prop) {
-  if (!prop) return [0,0,0];
-  if (prop.a === 1) {
-    const k = prop.k;
-    if (Array.isArray(k) && k.length > 0 && k[0].s) return [...k[0].s];
-    return [0,0,0];
-  }
-  const k = prop.k;
-  if (Array.isArray(k)) return [...k];
-  return [k, k, k];
-}
-
-function findStoneLayer(data) {
-  return data.layers.find(l =>
-    (l.nm === 'Stone_0319.png' && l.ty === 2) ||
-    (l.nm === 'stone' && l.ty === 0)
-  ) || null;
-}
-
-function getStoneParentChain(data) {
-  const stone = findStoneLayer(data);
-  if (!stone) return null;
-  const layerMap = {};
-  data.layers.forEach(l => { if (l.ind !== undefined) layerMap[l.ind] = l; });
-  const chain = [];
-  let cur = stone;
-  while (cur) {
-    chain.push(cur);
-    cur = (cur.parent != null) ? layerMap[cur.parent] : null;
-  }
-  let totalSx = 1, totalSy = 1;
-  for (const l of chain) {
-    const s = getRestValue(l.ks?.s);
-    totalSx *= s[0] / 100;
-    totalSy *= s[1] / 100;
-  }
-  return { stoneInd: stone.ind, chain, totalSx, totalSy };
-}
-
-function canvasToStoneLocal(cx, cy, data) {
-  const stone = findStoneLayer(data);
-  if (!stone) return { x: cx, y: cy };
-  const layerMap = {};
-  data.layers.forEach(l => { if (l.ind !== undefined) layerMap[l.ind] = l; });
-  const chain = [];
-  let cur = stone;
-  while (cur) {
-    chain.push(cur);
-    cur = (cur.parent != null) ? layerMap[cur.parent] : null;
-  }
-  let x = cx, y = cy;
-  for (let i = chain.length - 1; i >= 0; i--) {
-    const l = chain[i];
-    const anchor = getRestValue(l.ks?.a);
-    const pos = getRestValue(l.ks?.p);
-    const scale = getRestValue(l.ks?.s);
-    const sx = scale[0] / 100, sy = scale[1] / 100;
-    x = anchor[0] + (x - pos[0]) / sx;
-    y = anchor[1] + (y - pos[1]) / sy;
-  }
-  return { x, y };
-}
-
-// ─── Built-in Motion Definitions ───
-const ROPE_X = 149.315;
-
-const MOTIONS = [
-  {
-    id:'idle', label:'기본', icon:'🪨',
-    apply: d => d
-  },
-  {
-    id:'swing', label:'흔들흔들', icon:'🔔',
-    apply: d => {
-      const rope = findLayer(d,'rope2.png');
-      if (rope) rope.ks.r = makeRotKf([
-        [0,0],[19,10],[56,-10],[94,10],[131,-10],[150,0]
-      ]);
-      return d;
-    }
-  },
-  {
-    id:'bounce', label:'통통', icon:'⬆️',
-    apply: d => {
-      const rope = findLayer(d,'rope2.png');
-      if (rope) rope.ks.p = makePosKf([
-        [0,[ROPE_X,0,0]],[12,[ROPE_X,-18,0]],[24,[ROPE_X,2,0]],
-        [38,[ROPE_X,-18,0]],[50,[ROPE_X,2,0]],[65,[ROPE_X,-14,0]],
-        [77,[ROPE_X,0,0]],[92,[ROPE_X,-14,0]],[104,[ROPE_X,0,0]],
-        [120,[ROPE_X,-8,0]],[132,[ROPE_X,0,0]],[150,[ROPE_X,0,0]]
-      ]);
-      return d;
-    }
-  },
-  {
-    id:'shake', label:'부들부들', icon:'🫨',
-    apply: d => {
-      const rope = findLayer(d,'rope2.png');
-      if (!rope) return d;
-      const pts = [];
-      for (let f = 0; f <= 150; f += 3) {
-        const amp = f < 90 ? 4 : Math.max(0.5, 4 * (1 - (f-90)/60));
-        const v = (f % 6 === 0) ? amp : -amp;
-        pts.push([Math.min(f,150), f===0||f>=150 ? 0 : v]);
+      function genSlotId() {
+        return (
+          "s_" +
+          (typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID().replace(/-/g, "").slice(0, 10)
+            : String(Date.now()) + Math.random().toString(36).slice(2, 8))
+        );
       }
-      pts[pts.length-1] = [150, 0];
-      rope.ks.r = makeRotKf(pts);
-      return d;
-    }
-  },
-  {
-    id:'nod', label:'끄덕끄덕', icon:'😊',
-    apply: d => {
-      const rope = findLayer(d,'rope2.png');
-      if (rope) rope.ks.r = makeRotKf([
-        [0,0],[12,4],[28,-1],[48,0],
-        [60,4],[76,-1],[96,0],
-        [108,4],[124,-1],[140,0],[150,0]
-      ]);
-      return d;
-    }
-  },
-  {
-    id:'spin', label:'빙글빙글', icon:'🌀',
-    apply: d => {
-      const stone = findLayer(d,'Stone_0319.png');
-      if (stone) stone.ks.r = makeRotKf([
-        [0,0],[75,180],[150,360]
-      ]);
-      return d;
-    }
-  },
-  {
-    id:'float', label:'둥실둥실', icon:'☁️',
-    apply: d => {
-      const rope = findLayer(d,'rope2.png');
-      if (rope) rope.ks.p = makePosKf([
-        [0,[ROPE_X,0,0]],[38,[ROPE_X,-10,0]],
-        [75,[ROPE_X,0,0]],[113,[ROPE_X,-10,0]],
-        [150,[ROPE_X,0,0]]
-      ]);
-      return d;
-    }
-  },
-  {
-    id:'excited', label:'신남', icon:'🥳',
-    apply: d => {
-      const rope = findLayer(d,'rope2.png');
-      const stone = findLayer(d,'Stone_0319.png');
-      if (rope) {
-        rope.ks.r = makeRotKf([
-          [0,0],[8,6],[20,-6],[32,6],[44,-6],[56,5],[68,-5],[80,4],[92,-4],[104,3],[116,-3],[128,2],[140,-1],[150,0]
-        ]);
-        rope.ks.p = makePosKf([
-          [0,[ROPE_X,0,0]],[10,[ROPE_X,-12,0]],[22,[ROPE_X,0,0]],
-          [34,[ROPE_X,-12,0]],[46,[ROPE_X,0,0]],[58,[ROPE_X,-10,0]],
-          [70,[ROPE_X,0,0]],[82,[ROPE_X,-10,0]],[94,[ROPE_X,0,0]],
-          [106,[ROPE_X,-6,0]],[118,[ROPE_X,0,0]],[130,[ROPE_X,-4,0]],
-          [142,[ROPE_X,0,0]],[150,[ROPE_X,0,0]]
-        ]);
+      function emptySlot(category) {
+        const ov = TYPES.includes(category);
+        return {
+          id: genSlotId(),
+          category,
+          data: null,
+          x: ov ? DEFAULT_OFFSETS[category].x : 0,
+          y: ov ? DEFAULT_OFFSETS[category].y : 0,
+          scale: 100,
+          loaded: false,
+          fileName: "",
+        };
       }
-      if (stone) stone.ks.s = makeScaleKf([
-        [0,[200,200,100]],[10,[210,190,100]],[22,[200,200,100]],
-        [34,[210,190,100]],[46,[200,200,100]],[58,[206,194,100]],
-        [70,[200,200,100]],[82,[206,194,100]],[94,[200,200,100]],
-        [150,[200,200,100]]
-      ]);
-      return d;
-    }
-  },
-  {
-    id:'dizzy', label:'어지러움', icon:'😵‍💫',
-    apply: d => {
-      const rope = findLayer(d,'rope2.png');
-      const stone = findLayer(d,'Stone_0319.png');
-      if (rope) rope.ks.r = makeRotKf([
-        [0,0],[10,15],[25,-12],[40,15],[55,-12],[70,10],[85,-8],[100,6],[115,-4],[130,2],[145,-1],[150,0]
-      ]);
-      if (stone) stone.ks.r = makeRotKf([
-        [0,0],[20,-10],[50,10],[80,-8],[110,6],[140,-3],[150,0]
-      ]);
-      return d;
-    }
-  },
-  {id:'surprise', label:'놀람', icon:'😲', file:'motions/surprise.json'},
-  {id:'expect',   label:'기대',  icon:'🥺', file:'motions/expect.json'},
-  {id:'dust',     label:'먼지',  icon:'💨', file:'motions/dust.json'},
-];
+      const slotLists = {
+        background: [emptySlot("background")],
+        bgBack: [emptySlot("bgBack")],
+        eyes: [emptySlot("eyes")],
+        mouth: [emptySlot("mouth")],
+        accessory: [emptySlot("accessory")],
+      };
 
-const motionCache = {};
-
-// ─── Motion UI ───
-function buildMotionGrid() {
-  const grid = document.getElementById('motionGrid');
-  grid.innerHTML = '';
-  MOTIONS.forEach(m => {
-    const card = document.createElement('div');
-    card.className = 'motion-card' + (m.id === currentMotionId ? ' active' : '');
-    card.dataset.id = m.id;
-    card.innerHTML = `<span class="icon">${m.icon}</span><span class="name">${m.label}</span>`;
-    card.onclick = () => selectMotion(m.id);
-    grid.appendChild(card);
-  });
-}
-
-async function selectMotion(id) {
-  const m = MOTIONS.find(x => x.id === id);
-  if (!m) return;
-  currentMotionId = id;
-  if (m.file) {
-    if (motionCache[id]) {
-      currentBaseData = cloneJ(motionCache[id]);
-    } else {
-      try {
-        const resp = await fetch(m.file);
-        if (!resp.ok) throw new Error('fetch failed');
-        const data = await resp.json();
-        motionCache[id] = data;
-        currentBaseData = cloneJ(data);
-      } catch(e) {
-        alert('모션 파일을 불러올 수 없습니다: ' + m.file);
-        return;
+      function getSlot(category, id) {
+        return slotLists[category].find((s) => s.id === id);
       }
-    }
-  } else if (m.apply) {
-    currentBaseData = m.apply(cloneJ(originalBaseData));
-  }
-  document.querySelectorAll('.motion-card').forEach(c => c.classList.toggle('active', c.dataset.id === id));
-  document.getElementById('motionLabel').textContent = '움직임: ' + m.label;
-  renderPreview();
-  updateDownloadBtn();
-}
-
-function handleMotionUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.v || !data.layers) throw new Error('Invalid Lottie');
-      currentMotionId = 'custom';
-      motionCache['custom'] = data;
-      currentBaseData = cloneJ(data);
-      document.querySelectorAll('.motion-card').forEach(c => c.classList.remove('active'));
-      document.getElementById('motionLabel').textContent = '움직임: ' + file.name;
-      document.getElementById('motionFileName').textContent = file.name;
-      renderPreview();
-      updateDownloadBtn();
-    } catch(err) {
-      alert('유효한 Lottie JSON 파일이 아닙니다.');
-    }
-  };
-  reader.readAsText(file);
-}
-
-// ─── Init ───
-async function init() {
-  buildMotionGrid();
-  try {
-    const resp = await fetch('stone_base.json');
-    if (!resp.ok) throw new Error('fetch failed');
-    originalBaseData = await resp.json();
-  } catch(e) {
-    const input = document.createElement('input');
-    input.type='file'; input.accept='.json';
-    input.onchange = async () => {
-      const text = await input.files[0].text();
-      originalBaseData = JSON.parse(text);
-      currentBaseData = cloneJ(originalBaseData);
-      renderPreview();
-    };
-    alert('stone_base.json을 불러올 수 없습니다. 파일을 직접 선택해주세요.');
-    input.click();
-    return;
-  }
-  currentBaseData = cloneJ(originalBaseData);
-  renderPreview();
-}
-
-// ─── Unified Preview (single merged Lottie — overlays follow stone) ───
-function renderPreview() {
-  if (!window.__DotLottie) return;
-  const canvas = document.getElementById('baseCanvas');
-  const prevFrame = baseAnimation ? baseAnimation.currentFrame : 0;
-  if (baseAnimation) { baseAnimation.destroy(); baseAnimation = null; }
-  if (prevBlobUrl) { URL.revokeObjectURL(prevBlobUrl); prevBlobUrl = null; }
-  if (!currentBaseData) return;
-
-  const hasOverlays = TYPES.some(t => elements[t].loaded) || bgElement.loaded || bgBackElement.loaded;
-  const animData = (hasOverlays || currentMotionId !== 'idle') ? buildMergedJson() : cloneJ(currentBaseData);
-
-  const blob = new Blob([JSON.stringify(animData)], {type:'application/json'});
-  prevBlobUrl = URL.createObjectURL(blob);
-
-  baseAnimation = new window.__DotLottie({
-    canvas, autoplay:true, loop:true,
-    src: prevBlobUrl,
-    renderConfig: { devicePixelRatio: 2 }
-  });
-  if (prevFrame > 0) {
-    baseAnimation.addEventListener('load', () => {
-      baseAnimation.setFrame(prevFrame);
-      baseAnimation.play();
-    });
-  }
-}
-
-function schedulePreviewRebuild() {
-  if (previewTimer) clearTimeout(previewTimer);
-  previewTimer = setTimeout(renderPreview, 60);
-}
-
-// ─── Image → Lottie JSON wrapper ───
-function imageToLottieJson(dataUrl, w, h) {
-  return {
-    v:'5.7.0', fr:30, ip:0, op:60, w:w, h:h, nm:'image', ddd:0,
-    assets:[{id:'img_0', w:w, h:h, u:'', p:dataUrl, e:1}],
-    layers:[{
-      ty:2, refId:'img_0', nm:'image', sr:1, st:0, op:60, ip:0, ind:1,
-      ks:{
-        o:{a:0,k:100}, r:{a:0,k:0},
-        p:{a:0,k:[0,0,0]}, a:{a:0,k:[0,0,0]},
-        s:{a:0,k:[100,100,100]}
+      function anySlotLoaded() {
+        return SLOT_CATS.some((c) => slotLists[c].some((s) => s.loaded));
       }
-    }]
-  };
-}
 
-function isImageFile(file) {
-  return /\.(png|jpe?g)$/i.test(file.name);
-}
-
-function loadImageAsLottie(file, callback) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const data = imageToLottieJson(e.target.result, img.naturalWidth, img.naturalHeight);
-      callback(data);
-    };
-    img.onerror = () => alert('이미지 파일을 읽을 수 없습니다.');
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-// ─── Element Upload / Control ───
-function triggerUpload(type) { document.getElementById(type+'File').click(); }
-
-function applyElementData(type, data, fileName) {
-  elements[type].data = data;
-  elements[type].loaded = true;
-  elements[type].x = DEFAULT_OFFSETS[type].x;
-  elements[type].y = DEFAULT_OFFSETS[type].y;
-  elements[type].scale = 100;
-  document.getElementById(type+'FileName').textContent = fileName;
-  document.getElementById(type+'Status').textContent = '✓ 로드됨';
-  document.getElementById(type+'RemoveBtn').style.display = '';
-  document.getElementById(type+'Controls').classList.add('visible');
-  resetSliders(type);
-  renderPreview();
-  setActive(type);
-  updateDownloadBtn();
-}
-
-function handleUpload(type, input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (isImageFile(file)) {
-    loadImageAsLottie(file, data => applyElementData(type, data, file.name));
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.v || !data.layers) throw new Error('Invalid Lottie');
-      applyElementData(type, data, file.name);
-    } catch(err) { alert('유효한 Lottie JSON 파일이 아닙니다: '+err.message); }
-  };
-  reader.readAsText(file);
-}
-
-function move(type,dx,dy) {
-  const el = elements[type];
-  if (!el.loaded) return;
-  el.x = Math.round(Math.max(-150,Math.min(150, el.x+dx*stepSize)));
-  el.y = Math.round(Math.max(-150,Math.min(150, el.y+dy*stepSize)));
-  updateUI(type);
-  schedulePreviewRebuild();
-}
-function setPos(type,axis,val) {
-  const el = elements[type]; if (!el.loaded) return;
-  if (axis==='x') el.x=parseInt(val); else el.y=parseInt(val);
-  updateUI(type);
-  schedulePreviewRebuild();
-}
-function setScale(type,val) {
-  const el = elements[type]; el.scale=parseInt(val);
-  document.getElementById(type+'ScaleVal').textContent=el.scale+'%';
-  if (el.loaded) schedulePreviewRebuild();
-}
-function resetSliders(type) {
-  const el = elements[type];
-  const sx=document.getElementById(type+'RangeX'), sy=document.getElementById(type+'RangeY');
-  if (sx) sx.value=el.x; if (sy) sy.value=el.y;
-  const scaleSlider = document.querySelector(`[data-type="${type}"] input[type="range"][max="300"]`);
-  if (scaleSlider) scaleSlider.value=el.scale;
-  updateUI(type);
-}
-function updateUI(type) {
-  const el = elements[type];
-  document.getElementById(type+'Pos').textContent=`${el.x},${el.y}`;
-  document.getElementById(type+'XVal').textContent=el.x;
-  document.getElementById(type+'YVal').textContent=el.y;
-  document.getElementById(type+'ScaleVal').textContent=el.scale+'%';
-  const sx=document.getElementById(type+'RangeX'), sy=document.getElementById(type+'RangeY');
-  if (sx) sx.value=el.x; if (sy) sy.value=el.y;
-}
-function removeElement(type) {
-  const el = elements[type];
-  el.data=null; el.loaded=false;
-  el.x=DEFAULT_OFFSETS[type].x; el.y=DEFAULT_OFFSETS[type].y; el.scale=100;
-  document.getElementById(type+'FileName').textContent='';
-  document.getElementById(type+'Status').textContent='파일 없음';
-  document.getElementById(type+'RemoveBtn').style.display='none';
-  document.getElementById(type+'Controls').classList.remove('visible');
-  document.getElementById(type+'File').value='';
-  resetSliders(type);
-  if (activeType===type) setActive(null);
-  renderPreview();
-  updateDownloadBtn();
-}
-function setActive(type) {
-  activeType = type;
-  document.querySelectorAll('.control-group').forEach(g=>g.classList.remove('active'));
-  if (type) {
-    document.querySelector(`[data-type="${type}"]`).classList.add('active');
-    const nameMap = {background:'배경',eyes:'눈',mouth:'입',accessory:'악세서리'};
-    document.getElementById('activeInfo').textContent='선택: '+(nameMap[type]||type);
-  } else { document.getElementById('activeInfo').textContent='선택: 없음'; }
-}
-// ─── Background (front overlay, no stone parenting) ───
-function applyBgData(data, fileName) {
-  bgElement.data = data;
-  bgElement.loaded = true;
-  bgElement.x = 0; bgElement.y = 0; bgElement.scale = 100;
-  document.getElementById('backgroundFileName').textContent = fileName;
-  document.getElementById('backgroundStatus').textContent = '✓ 로드됨';
-  document.getElementById('backgroundRemoveBtn').style.display = '';
-  document.getElementById('backgroundControls').classList.add('visible');
-  resetBgSliders();
-  renderPreview();
-  setActive('background');
-  updateDownloadBtn();
-}
-function handleBgUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (isImageFile(file)) {
-    loadImageAsLottie(file, data => applyBgData(data, file.name));
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.v || !data.layers) throw new Error('Invalid Lottie');
-      applyBgData(data, file.name);
-    } catch(err) { alert('유효한 Lottie JSON 파일이 아닙니다: '+err.message); }
-  };
-  reader.readAsText(file);
-}
-function moveBg(dx,dy) {
-  if (!bgElement.loaded) return;
-  bgElement.x = Math.round(Math.max(-150,Math.min(150, bgElement.x+dx*stepSize)));
-  bgElement.y = Math.round(Math.max(-150,Math.min(150, bgElement.y+dy*stepSize)));
-  updateBgUI(); schedulePreviewRebuild();
-}
-function setBgPos(axis,val) {
-  if (!bgElement.loaded) return;
-  if (axis==='x') bgElement.x=parseInt(val); else bgElement.y=parseInt(val);
-  updateBgUI(); schedulePreviewRebuild();
-}
-function setBgScale(val) {
-  bgElement.scale=parseInt(val);
-  document.getElementById('backgroundScaleVal').textContent=bgElement.scale+'%';
-  if (bgElement.loaded) schedulePreviewRebuild();
-}
-function resetBgSliders() {
-  const sx=document.getElementById('backgroundRangeX'), sy=document.getElementById('backgroundRangeY');
-  if (sx) sx.value=bgElement.x; if (sy) sy.value=bgElement.y;
-  const ss=document.querySelector('[data-type="background"] input[type="range"][max="300"]');
-  if (ss) ss.value=bgElement.scale;
-  updateBgUI();
-}
-function updateBgUI() {
-  document.getElementById('backgroundPos').textContent=`${bgElement.x},${bgElement.y}`;
-  document.getElementById('backgroundXVal').textContent=bgElement.x;
-  document.getElementById('backgroundYVal').textContent=bgElement.y;
-  document.getElementById('backgroundScaleVal').textContent=bgElement.scale+'%';
-  const sx=document.getElementById('backgroundRangeX'), sy=document.getElementById('backgroundRangeY');
-  if (sx) sx.value=bgElement.x; if (sy) sy.value=bgElement.y;
-}
-function removeBg() {
-  bgElement.data=null; bgElement.loaded=false;
-  bgElement.x=0; bgElement.y=0; bgElement.scale=100;
-  document.getElementById('backgroundFileName').textContent='';
-  document.getElementById('backgroundStatus').textContent='파일 없음';
-  document.getElementById('backgroundRemoveBtn').style.display='none';
-  document.getElementById('backgroundControls').classList.remove('visible');
-  document.getElementById('backgroundFile').value='';
-  resetBgSliders();
-  if (activeType==='background') setActive(null);
-  renderPreview();
-  updateDownloadBtn();
-}
-
-// ─── Back Background (behind stone) ───
-function applyBgBackData(data, fileName) {
-  bgBackElement.data = data;
-  bgBackElement.loaded = true;
-  bgBackElement.x = 0; bgBackElement.y = 0; bgBackElement.scale = 100;
-  document.getElementById('bgBackFileName').textContent = fileName;
-  document.getElementById('bgBackStatus').textContent = '✓ 로드됨';
-  document.getElementById('bgBackRemoveBtn').style.display = '';
-  document.getElementById('bgBackControls').classList.add('visible');
-  resetBgBackSliders();
-  renderPreview();
-  setActive('bgBack');
-  updateDownloadBtn();
-}
-function handleBgBackUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (isImageFile(file)) {
-    loadImageAsLottie(file, data => applyBgBackData(data, file.name));
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!data.v || !data.layers) throw new Error('Invalid Lottie');
-      applyBgBackData(data, file.name);
-    } catch(err) { alert('유효한 Lottie JSON 파일이 아닙니다: '+err.message); }
-  };
-  reader.readAsText(file);
-}
-function moveBgBack(dx,dy) {
-  if (!bgBackElement.loaded) return;
-  bgBackElement.x = Math.round(Math.max(-150,Math.min(150, bgBackElement.x+dx*stepSize)));
-  bgBackElement.y = Math.round(Math.max(-150,Math.min(150, bgBackElement.y+dy*stepSize)));
-  updateBgBackUI(); schedulePreviewRebuild();
-}
-function setBgBackPos(axis,val) {
-  if (!bgBackElement.loaded) return;
-  if (axis==='x') bgBackElement.x=parseInt(val); else bgBackElement.y=parseInt(val);
-  updateBgBackUI(); schedulePreviewRebuild();
-}
-function setBgBackScale(val) {
-  bgBackElement.scale=parseInt(val);
-  document.getElementById('bgBackScaleVal').textContent=bgBackElement.scale+'%';
-  if (bgBackElement.loaded) schedulePreviewRebuild();
-}
-function resetBgBackSliders() {
-  const sx=document.getElementById('bgBackRangeX'), sy=document.getElementById('bgBackRangeY');
-  if (sx) sx.value=bgBackElement.x; if (sy) sy.value=bgBackElement.y;
-  const ss=document.querySelector('[data-type="bgBack"] input[type="range"][max="300"]');
-  if (ss) ss.value=bgBackElement.scale;
-  updateBgBackUI();
-}
-function updateBgBackUI() {
-  document.getElementById('bgBackPos').textContent=`${bgBackElement.x},${bgBackElement.y}`;
-  document.getElementById('bgBackXVal').textContent=bgBackElement.x;
-  document.getElementById('bgBackYVal').textContent=bgBackElement.y;
-  document.getElementById('bgBackScaleVal').textContent=bgBackElement.scale+'%';
-  const sx=document.getElementById('bgBackRangeX'), sy=document.getElementById('bgBackRangeY');
-  if (sx) sx.value=bgBackElement.x; if (sy) sy.value=bgBackElement.y;
-}
-function removeBgBack() {
-  bgBackElement.data=null; bgBackElement.loaded=false;
-  bgBackElement.x=0; bgBackElement.y=0; bgBackElement.scale=100;
-  document.getElementById('bgBackFileName').textContent='';
-  document.getElementById('bgBackStatus').textContent='파일 없음';
-  document.getElementById('bgBackRemoveBtn').style.display='none';
-  document.getElementById('bgBackControls').classList.remove('visible');
-  document.getElementById('bgBackFile').value='';
-  resetBgBackSliders();
-  if (activeType==='bgBack') setActive(null);
-  renderPreview();
-  updateDownloadBtn();
-}
-
-function updateDownloadBtn() {
-  const anyElement = TYPES.some(t=>elements[t].loaded) || bgElement.loaded || bgBackElement.loaded;
-  const hasMotion = currentMotionId !== 'idle';
-  document.getElementById('downloadBtn').disabled = !(anyElement || hasMotion);
-}
-
-// ─── Merge & Download ───
-function createLoopTimeRemap(innerDurSec, outerOp, outerFr) {
-  const outerDurFrames = outerOp;
-  const innerFrames = Math.round(innerDurSec * outerFr);
-  if (innerFrames >= outerDurFrames) return null;
-  const kf = [];
-  let f = 0;
-  while (f < outerDurFrames) {
-    kf.push({t:f, s:[0]});
-    if (f + innerFrames < outerDurFrames) {
-      kf.push({t:f + innerFrames - 1, s:[innerDurSec - 1/outerFr], h:1});
-      f += innerFrames;
-    } else {
-      const rem = outerDurFrames - f;
-      kf.push({t:f + rem, s:[rem / outerFr]});
-      break;
-    }
-  }
-  return {a:1, k:kf};
-}
-
-function scaleAnimTimes(obj, ratio) {
-  if (!obj || typeof obj !== 'object') return;
-  if (Array.isArray(obj)) {
-    for (const item of obj) scaleAnimTimes(item, ratio);
-    return;
-  }
-  if (obj.a === 1 && Array.isArray(obj.k) && obj.k.length > 0
-      && obj.k[0] && typeof obj.k[0] === 'object' && 't' in obj.k[0]) {
-    for (const kf of obj.k) {
-      if ('t' in kf) kf.t = Math.round(kf.t * ratio);
-    }
-    return;
-  }
-  for (const v of Object.values(obj)) scaleAnimTimes(v, ratio);
-}
-
-function buildMergedJson() {
-  const merged = cloneJ(currentBaseData);
-  const baseFr = merged.fr;
-
-  const stoneInfo = getStoneParentChain(merged);
-  const hasStone = stoneInfo && stoneInfo.stoneInd != null;
-
-  TYPES.forEach((type,idx) => {
-    const el = elements[type];
-    if (!el.loaded||!el.data) return;
-    const src = cloneJ(el.data);
-    const prefix = type+'_';
-    const indOffset = (idx+1)*1000;
-    const assetIdMap = {};
-    (src.assets||[]).forEach(asset => {
-      const oldId=asset.id; const newId=prefix+oldId;
-      assetIdMap[oldId]=newId; asset.id=newId;
-      merged.assets.push(asset);
-    });
-    const processedLayers = src.layers.map(layer => {
-      const nl = cloneJ(layer);
-      if (nl.ind!==undefined) nl.ind=nl.ind+indOffset;
-      if (nl.parent!==undefined) nl.parent=nl.parent+indOffset;
-      if (nl.refId&&assetIdMap[nl.refId]) nl.refId=assetIdMap[nl.refId];
-      return nl;
-    });
-    const compId = prefix+'comp';
-    const srcFr = src.fr || baseFr;
-    merged.assets.push({id:compId,layers:processedLayers,w:src.w,h:src.h,nm:type+'_composition',fr:srcFr});
-    const ow=src.w, oh=src.h;
-
-    let posX, posY, scaleX, scaleY, parentInd;
-    const canvasCx = CANVAS_W/2 + el.x, canvasCy = CANVAS_H/2 + el.y;
-
-    const fitRatio = Math.max(CANVAS_W/ow, CANVAS_H/oh);
-    if (hasStone) {
-      const local = canvasToStoneLocal(canvasCx, canvasCy, merged);
-      posX = local.x;
-      posY = local.y;
-      scaleX = fitRatio * el.scale / stoneInfo.totalSx;
-      scaleY = fitRatio * el.scale / stoneInfo.totalSy;
-      parentInd = stoneInfo.stoneInd;
-    } else {
-      posX = canvasCx;
-      posY = canvasCy;
-      scaleX = fitRatio * el.scale;
-      scaleY = fitRatio * el.scale;
-    }
-
-    const compLayer = {
-      ty:0, nm:type, sr:1, st:merged.ip, op:merged.op, ip:merged.ip,
-      w:ow, h:oh, refId:compId, ind:50+idx,
-      ks:{
-        a:{a:0,k:[ow/2,oh/2,0]},
-        s:{a:0,k:[scaleX,scaleY,100]},
-        p:{a:0,k:[posX,posY,0]},
-        r:{a:0,k:0},
-        o:{a:0,k:100}
+      // ─── Keyframe Helpers ───
+      function makeRotKf(pts) {
+        return {
+          a: 1,
+          k: pts.map((p, i) => {
+            const kf = { t: p[0], s: [p[1]] };
+            if (i < pts.length - 1) {
+              kf.o = { x: 0.33, y: 0 };
+              kf.i = { x: 0.67, y: 1 };
+            }
+            return kf;
+          }),
+        };
       }
-    };
-    if (parentInd !== undefined) compLayer.parent = parentInd;
-
-    const innerDurSec = (src.op-(src.ip||0)) / srcFr;
-    const outerOp = merged.op-merged.ip;
-    const tm = createLoopTimeRemap(innerDurSec, outerOp, baseFr);
-    if(tm) compLayer.tm=tm;
-    merged.layers.unshift(compLayer);
-  });
-
-  if (bgElement.loaded && bgElement.data) {
-    const src = cloneJ(bgElement.data);
-    const prefix = 'bg_';
-    const indOffset = 4000;
-    const assetIdMap = {};
-    (src.assets||[]).forEach(asset => {
-      const oldId=asset.id; const newId=prefix+oldId;
-      assetIdMap[oldId]=newId; asset.id=newId;
-      merged.assets.push(asset);
-    });
-    const processedLayers = src.layers.map(layer => {
-      const nl = cloneJ(layer);
-      if (nl.ind!==undefined) nl.ind+=indOffset;
-      if (nl.parent!==undefined) nl.parent+=indOffset;
-      if (nl.refId&&assetIdMap[nl.refId]) nl.refId=assetIdMap[nl.refId];
-      return nl;
-    });
-    const compId = prefix+'comp';
-    const bgFr = src.fr || merged.fr;
-    merged.assets.push({id:compId,layers:processedLayers,w:src.w,h:src.h,nm:'bg_composition',fr:bgFr});
-    const ow=src.w, oh=src.h;
-    const coverRatio = Math.max(CANVAS_W/ow, CANVAS_H/oh);
-    const scaleX=coverRatio*bgElement.scale, scaleY=coverRatio*bgElement.scale;
-    const posX=CANVAS_W/2+bgElement.x, posY=CANVAS_H/2+bgElement.y;
-    const bgLayer = {
-      ty:0, nm:'background', sr:1, st:merged.ip, op:merged.op, ip:merged.ip,
-      w:ow, h:oh, refId:compId, ind:49,
-      ks:{
-        a:{a:0,k:[ow/2,oh/2,0]},
-        s:{a:0,k:[scaleX,scaleY,100]},
-        p:{a:0,k:[posX,posY,0]},
-        r:{a:0,k:0},
-        o:{a:0,k:100}
+      function makePosKf(pts) {
+        return {
+          a: 1,
+          k: pts.map((p, i) => {
+            const kf = { t: p[0], s: p[1] };
+            if (i < pts.length - 1) {
+              kf.o = { x: 0.33, y: 0 };
+              kf.i = { x: 0.67, y: 1 };
+              kf.to = [0, 0, 0];
+              kf.ti = [0, 0, 0];
+            }
+            return kf;
+          }),
+        };
       }
-    };
-    const bgInnerDurSec = (src.op-(src.ip||0)) / bgFr;
-    const outerOp = merged.op-merged.ip;
-    const tm = createLoopTimeRemap(bgInnerDurSec, outerOp, merged.fr);
-    if(tm) bgLayer.tm=tm;
-    merged.layers.unshift(bgLayer);
-  }
-
-  if (bgBackElement.loaded && bgBackElement.data) {
-    const src = cloneJ(bgBackElement.data);
-    const prefix = 'bgb_';
-    const indOffset = 6000;
-    const assetIdMap = {};
-    (src.assets||[]).forEach(asset => {
-      const oldId=asset.id; const newId=prefix+oldId;
-      assetIdMap[oldId]=newId; asset.id=newId;
-      merged.assets.push(asset);
-    });
-    const processedLayers = src.layers.map(layer => {
-      const nl = cloneJ(layer);
-      if (nl.ind!==undefined) nl.ind+=indOffset;
-      if (nl.parent!==undefined) nl.parent+=indOffset;
-      if (nl.refId&&assetIdMap[nl.refId]) nl.refId=assetIdMap[nl.refId];
-      return nl;
-    });
-    const compId = prefix+'comp';
-    const bgbFr = src.fr || merged.fr;
-    merged.assets.push({id:compId,layers:processedLayers,w:src.w,h:src.h,nm:'bgback_composition',fr:bgbFr});
-    const ow=src.w, oh=src.h;
-    const coverRatio = Math.max(CANVAS_W/ow, CANVAS_H/oh);
-    const scaleX=coverRatio*bgBackElement.scale, scaleY=coverRatio*bgBackElement.scale;
-    const posX=CANVAS_W/2+bgBackElement.x, posY=CANVAS_H/2+bgBackElement.y;
-    const bgbLayer = {
-      ty:0, nm:'back_background', sr:1, st:merged.ip, op:merged.op, ip:merged.ip,
-      w:ow, h:oh, refId:compId, ind:48,
-      ks:{
-        a:{a:0,k:[ow/2,oh/2,0]},
-        s:{a:0,k:[scaleX,scaleY,100]},
-        p:{a:0,k:[posX,posY,0]},
-        r:{a:0,k:0},
-        o:{a:0,k:100}
+      function makeScaleKf(pts) {
+        return {
+          a: 1,
+          k: pts.map((p, i) => {
+            const kf = { t: p[0], s: p[1] };
+            if (i < pts.length - 1) {
+              kf.o = { x: [0.33, 0.33, 0.33], y: [0, 0, 0] };
+              kf.i = { x: [0.67, 0.67, 0.67], y: [1, 1, 1] };
+            }
+            return kf;
+          }),
+        };
       }
-    };
-    const bgbInnerDurSec = (src.op-(src.ip||0)) / bgbFr;
-    const outerOp = merged.op-merged.ip;
-    const tm = createLoopTimeRemap(bgbInnerDurSec, outerOp, merged.fr);
-    if(tm) bgbLayer.tm=tm;
-    merged.layers.push(bgbLayer);
-  }
+      function findLayer(data, nm) {
+        return data.layers.find((l) => l.nm === nm);
+      }
+      function cloneJ(o) {
+        return JSON.parse(JSON.stringify(o));
+      }
 
-  return merged;
-}
+      // ─── Stone Layer Helpers (for parenting overlays to stone movement) ───
+      function getRestValue(prop) {
+        if (!prop) return [0, 0, 0];
+        if (prop.a === 1) {
+          const k = prop.k;
+          if (Array.isArray(k) && k.length > 0 && k[0].s) return [...k[0].s];
+          return [0, 0, 0];
+        }
+        const k = prop.k;
+        if (Array.isArray(k)) return [...k];
+        return [k, k, k];
+      }
 
-function downloadMerged() {
-  const merged = buildMergedJson();
-  const blob = new Blob([JSON.stringify(merged)],{type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url;
-  a.download='stone_custom_'+Date.now()+'.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
+      function findStoneLayer(data) {
+        return (
+          data.layers.find(
+            (l) =>
+              (l.nm === "Stone_0319.png" && l.ty === 2) ||
+              (l.nm === "stone" && l.ty === 0),
+          ) || null
+        );
+      }
 
-// ─── Event Listeners ───
-document.querySelectorAll('.step-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.step-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    stepSize = parseInt(btn.dataset.step);
-  });
-});
-function isTypeLoaded(type) {
-  if (type==='background') return bgElement.loaded;
-  if (type==='bgBack') return bgBackElement.loaded;
-  return elements[type]?.loaded;
-}
-document.querySelectorAll('.control-group').forEach(group => {
-  group.addEventListener('click', e => {
-    if (e.target.closest('.btn')||e.target.closest('.dpad-btn')||e.target.tagName==='INPUT') return;
-    const type=group.dataset.type;
-    if (isTypeLoaded(type)) setActive(type);
-  });
-  group.addEventListener('focus', () => {
-    const type=group.dataset.type;
-    if (isTypeLoaded(type)) setActive(type);
-  });
-});
-document.addEventListener('keydown', e => {
-  if (!document.getElementById('tab-customizer').classList.contains('active')) return;
-  if (!activeType) return;
-  if (!isTypeLoaded(activeType)) return;
-  if (e.target.tagName==='INPUT'&&e.target.type==='range') return;
-  const s=e.shiftKey?1:stepSize;
-  let dx=0,dy=0;
-  switch(e.key){
-    case 'ArrowUp':dy=-1;break;case 'ArrowDown':dy=1;break;
-    case 'ArrowLeft':dx=-1;break;case 'ArrowRight':dx=1;break;default:return;
-  }
-  e.preventDefault();
-  const old=stepSize; stepSize=s;
-  if (activeType==='background') moveBg(dx,dy);
-  else if (activeType==='bgBack') moveBgBack(dx,dy);
-  else move(activeType,dx,dy);
-  stepSize=old;
-});
+      function getStoneParentChain(data) {
+        const stone = findStoneLayer(data);
+        if (!stone) return null;
+        const layerMap = {};
+        data.layers.forEach((l) => {
+          if (l.ind !== undefined) layerMap[l.ind] = l;
+        });
+        const chain = [];
+        let cur = stone;
+        while (cur) {
+          chain.push(cur);
+          cur = cur.parent != null ? layerMap[cur.parent] : null;
+        }
+        let totalSx = 1,
+          totalSy = 1;
+        for (const l of chain) {
+          const s = getRestValue(l.ks?.s);
+          totalSx *= s[0] / 100;
+          totalSy *= s[1] / 100;
+        }
+        return { stoneInd: stone.ind, chain, totalSx, totalSy };
+      }
 
-// ─── Tab Switching ───
-function switchTab(tabId) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.getElementById('tab-'+tabId).classList.add('active');
-  const subtitles = {
-    customizer: '움직임을 선택하고, 눈·입·악세서리를 올려 나만의 돌맹이를 만들어보세요',
-    crop: '완성된 Lottie 파일을 300×300 크기로 조절하여 추출하세요',
-    gallery: 'Lottie JSON 파일을 올려 한눈에 미리보기하세요'
-  };
-  document.getElementById('headerSubtitle').textContent = subtitles[tabId] || '';
-}
+      function canvasToStoneLocal(cx, cy, data) {
+        const stone = findStoneLayer(data);
+        if (!stone) return { x: cx, y: cy };
+        const layerMap = {};
+        data.layers.forEach((l) => {
+          if (l.ind !== undefined) layerMap[l.ind] = l;
+        });
+        const chain = [];
+        let cur = stone;
+        while (cur) {
+          chain.push(cur);
+          cur = cur.parent != null ? layerMap[cur.parent] : null;
+        }
+        let x = cx,
+          y = cy;
+        for (let i = chain.length - 1; i >= 0; i--) {
+          const l = chain[i];
+          const anchor = getRestValue(l.ks?.a);
+          const pos = getRestValue(l.ks?.p);
+          const scale = getRestValue(l.ks?.s);
+          const sx = scale[0] / 100,
+            sy = scale[1] / 100;
+          x = anchor[0] + (x - pos[0]) / sx;
+          y = anchor[1] + (y - pos[1]) / sy;
+        }
+        return { x, y };
+      }
 
-// ─── Lottie Crop Tool ───
-let cropData = null;
-let cropAnimation = null;
-let cropBlobUrl = null;
-let cropState = { x:0, y:0, scale:100 };
-let cropStepSize = 3;
+      // ─── Built-in Motion Definitions ───
+      const ROPE_X = 149.315;
 
-function handleCropUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try { cropData = JSON.parse(e.target.result); }
-    catch { alert('올바른 JSON 파일이 아닙니다'); return; }
-    const durSec = Math.round((cropData.op-(cropData.ip||0))/cropData.fr*10)/10;
-    document.getElementById('cropFileName').textContent = file.name;
-    document.getElementById('cropFileDetail').textContent =
-      `${cropData.w}×${cropData.h} | ${cropData.fr}fps | ${durSec}초`;
-    document.getElementById('cropOrigSize').textContent = `원본: ${cropData.w}×${cropData.h}`;
-    document.getElementById('cropFileInfo').classList.add('visible');
-    document.getElementById('cropAdjust').classList.add('visible');
-    document.getElementById('cropDownloadBtn').disabled = false;
-    document.getElementById('cropUploadArea').classList.add('has-file');
-    cropState = {x:0, y:0, scale:100};
-    updateCropUI();
-    renderCropPreview();
-  };
-  reader.readAsText(file);
-}
+      const MOTIONS = [
+        {
+          id: "idle",
+          label: "기본",
+          icon: "🪨",
+          apply: (d) => d,
+        },
+        {
+          id: "swing",
+          label: "흔들흔들",
+          icon: "🔔",
+          apply: (d) => {
+            const rope = findLayer(d, "rope2.png");
+            if (rope)
+              rope.ks.r = makeRotKf([
+                [0, 0],
+                [19, 10],
+                [56, -10],
+                [94, 10],
+                [131, -10],
+                [150, 0],
+              ]);
+            return d;
+          },
+        },
+        {
+          id: "bounce",
+          label: "통통",
+          icon: "⬆️",
+          apply: (d) => {
+            const rope = findLayer(d, "rope2.png");
+            if (rope)
+              rope.ks.p = makePosKf([
+                [0, [ROPE_X, 0, 0]],
+                [12, [ROPE_X, -18, 0]],
+                [24, [ROPE_X, 2, 0]],
+                [38, [ROPE_X, -18, 0]],
+                [50, [ROPE_X, 2, 0]],
+                [65, [ROPE_X, -14, 0]],
+                [77, [ROPE_X, 0, 0]],
+                [92, [ROPE_X, -14, 0]],
+                [104, [ROPE_X, 0, 0]],
+                [120, [ROPE_X, -8, 0]],
+                [132, [ROPE_X, 0, 0]],
+                [150, [ROPE_X, 0, 0]],
+              ]);
+            return d;
+          },
+        },
+        {
+          id: "shake",
+          label: "부들부들",
+          icon: "🫨",
+          apply: (d) => {
+            const rope = findLayer(d, "rope2.png");
+            if (!rope) return d;
+            const pts = [];
+            for (let f = 0; f <= 150; f += 3) {
+              const amp = f < 90 ? 4 : Math.max(0.5, 4 * (1 - (f - 90) / 60));
+              const v = f % 6 === 0 ? amp : -amp;
+              pts.push([Math.min(f, 150), f === 0 || f >= 150 ? 0 : v]);
+            }
+            pts[pts.length - 1] = [150, 0];
+            rope.ks.r = makeRotKf(pts);
+            return d;
+          },
+        },
+        {
+          id: "nod",
+          label: "끄덕끄덕",
+          icon: "😊",
+          apply: (d) => {
+            const rope = findLayer(d, "rope2.png");
+            if (rope)
+              rope.ks.r = makeRotKf([
+                [0, 0],
+                [12, 4],
+                [28, -1],
+                [48, 0],
+                [60, 4],
+                [76, -1],
+                [96, 0],
+                [108, 4],
+                [124, -1],
+                [140, 0],
+                [150, 0],
+              ]);
+            return d;
+          },
+        },
+        {
+          id: "spin",
+          label: "빙글빙글",
+          icon: "🌀",
+          apply: (d) => {
+            const stone = findLayer(d, "Stone_0319.png");
+            if (stone)
+              stone.ks.r = makeRotKf([
+                [0, 0],
+                [75, 180],
+                [150, 360],
+              ]);
+            return d;
+          },
+        },
+        {
+          id: "float",
+          label: "둥실둥실",
+          icon: "☁️",
+          apply: (d) => {
+            const rope = findLayer(d, "rope2.png");
+            if (rope)
+              rope.ks.p = makePosKf([
+                [0, [ROPE_X, 0, 0]],
+                [38, [ROPE_X, -10, 0]],
+                [75, [ROPE_X, 0, 0]],
+                [113, [ROPE_X, -10, 0]],
+                [150, [ROPE_X, 0, 0]],
+              ]);
+            return d;
+          },
+        },
+        {
+          id: "excited",
+          label: "신남",
+          icon: "🥳",
+          apply: (d) => {
+            const rope = findLayer(d, "rope2.png");
+            const stone = findLayer(d, "Stone_0319.png");
+            if (rope) {
+              rope.ks.r = makeRotKf([
+                [0, 0],
+                [8, 6],
+                [20, -6],
+                [32, 6],
+                [44, -6],
+                [56, 5],
+                [68, -5],
+                [80, 4],
+                [92, -4],
+                [104, 3],
+                [116, -3],
+                [128, 2],
+                [140, -1],
+                [150, 0],
+              ]);
+              rope.ks.p = makePosKf([
+                [0, [ROPE_X, 0, 0]],
+                [10, [ROPE_X, -12, 0]],
+                [22, [ROPE_X, 0, 0]],
+                [34, [ROPE_X, -12, 0]],
+                [46, [ROPE_X, 0, 0]],
+                [58, [ROPE_X, -10, 0]],
+                [70, [ROPE_X, 0, 0]],
+                [82, [ROPE_X, -10, 0]],
+                [94, [ROPE_X, 0, 0]],
+                [106, [ROPE_X, -6, 0]],
+                [118, [ROPE_X, 0, 0]],
+                [130, [ROPE_X, -4, 0]],
+                [142, [ROPE_X, 0, 0]],
+                [150, [ROPE_X, 0, 0]],
+              ]);
+            }
+            if (stone)
+              stone.ks.s = makeScaleKf([
+                [0, [200, 200, 100]],
+                [10, [210, 190, 100]],
+                [22, [200, 200, 100]],
+                [34, [210, 190, 100]],
+                [46, [200, 200, 100]],
+                [58, [206, 194, 100]],
+                [70, [200, 200, 100]],
+                [82, [206, 194, 100]],
+                [94, [200, 200, 100]],
+                [150, [200, 200, 100]],
+              ]);
+            return d;
+          },
+        },
+        {
+          id: "dizzy",
+          label: "어지러움",
+          icon: "😵‍💫",
+          apply: (d) => {
+            const rope = findLayer(d, "rope2.png");
+            const stone = findLayer(d, "Stone_0319.png");
+            if (rope)
+              rope.ks.r = makeRotKf([
+                [0, 0],
+                [10, 15],
+                [25, -12],
+                [40, 15],
+                [55, -12],
+                [70, 10],
+                [85, -8],
+                [100, 6],
+                [115, -4],
+                [130, 2],
+                [145, -1],
+                [150, 0],
+              ]);
+            if (stone)
+              stone.ks.r = makeRotKf([
+                [0, 0],
+                [20, -10],
+                [50, 10],
+                [80, -8],
+                [110, 6],
+                [140, -3],
+                [150, 0],
+              ]);
+            return d;
+          },
+        },
+        {
+          id: "surprise",
+          label: "놀람",
+          icon: "😲",
+          file: "motions/surprise.json",
+        },
+        { id: "dust", label: "먼지", icon: "💨", file: "motions/dust.json" },
+      ];
 
-function removeCropFile() {
-  cropData = null;
-  if (cropAnimation) { cropAnimation.destroy(); cropAnimation = null; }
-  if (cropBlobUrl) { URL.revokeObjectURL(cropBlobUrl); cropBlobUrl = null; }
-  document.getElementById('cropFileInfo').classList.remove('visible');
-  document.getElementById('cropAdjust').classList.remove('visible');
-  document.getElementById('cropDownloadBtn').disabled = true;
-  document.getElementById('cropUploadArea').classList.remove('has-file');
-  document.getElementById('cropFileInput').value = '';
-  const ctx = document.getElementById('cropCanvas').getContext('2d');
-  ctx.clearRect(0,0,800,800);
-}
+      const motionCache = {};
 
-function updateCropUI() {
-  document.getElementById('cropScaleVal').textContent = cropState.scale+'%';
-  document.getElementById('cropXVal').textContent = cropState.x;
-  document.getElementById('cropYVal').textContent = cropState.y;
-  document.getElementById('cropPos').textContent = cropState.x+','+cropState.y;
-  document.getElementById('cropScaleRange').value = cropState.scale;
-  document.getElementById('cropRangeX').value = cropState.x;
-  document.getElementById('cropRangeY').value = cropState.y;
-}
+      // ─── Motion UI ───
+      function buildMotionGrid() {
+        const grid = document.getElementById("motionGrid");
+        grid.innerHTML = "";
+        MOTIONS.forEach((m) => {
+          const card = document.createElement("div");
+          card.className =
+            "motion-card" + (m.id === currentMotionId ? " active" : "");
+          card.dataset.id = m.id;
+          card.innerHTML = `<span class="icon">${m.icon}</span><span class="name">${m.label}</span>`;
+          card.onclick = () => selectMotion(m.id);
+          grid.appendChild(card);
+        });
+      }
 
-function setCropScale(v) {
-  cropState.scale = parseInt(v);
-  updateCropUI();
-  renderCropPreview();
-}
+      async function selectMotion(id) {
+        const m = MOTIONS.find((x) => x.id === id);
+        if (!m) return;
+        currentMotionId = id;
+        if (m.file) {
+          if (motionCache[id]) {
+            currentBaseData = cloneJ(motionCache[id]);
+          } else {
+            try {
+              const resp = await fetch(m.file);
+              if (!resp.ok) throw new Error("fetch failed");
+              const data = await resp.json();
+              motionCache[id] = data;
+              currentBaseData = cloneJ(data);
+            } catch (e) {
+              alert("모션 파일을 불러올 수 없습니다: " + m.file);
+              return;
+            }
+          }
+        } else if (m.apply) {
+          currentBaseData = m.apply(cloneJ(originalBaseData));
+        }
+        document
+          .querySelectorAll(".motion-card")
+          .forEach((c) => c.classList.toggle("active", c.dataset.id === id));
+        document.getElementById("motionLabel").textContent =
+          "움직임: " + m.label;
+        renderPreview();
+        updateDownloadBtn();
+      }
 
-function setCropPos(axis,v) {
-  cropState[axis] = parseInt(v);
-  updateCropUI();
-  renderCropPreview();
-}
+      function handleMotionUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (!data.v || !data.layers) throw new Error("Invalid Lottie");
+            currentMotionId = "custom";
+            motionCache["custom"] = data;
+            currentBaseData = cloneJ(data);
+            document
+              .querySelectorAll(".motion-card")
+              .forEach((c) => c.classList.remove("active"));
+            document.getElementById("motionLabel").textContent =
+              "움직임: " + file.name;
+            document.getElementById("motionFileName").textContent = file.name;
+            renderPreview();
+            updateDownloadBtn();
+          } catch (err) {
+            alert("유효한 Lottie JSON 파일이 아닙니다.");
+          }
+        };
+        reader.readAsText(file);
+      }
 
-function moveCrop(dx,dy) {
-  cropState.x += dx*cropStepSize;
-  cropState.y += dy*cropStepSize;
-  updateCropUI();
-  renderCropPreview();
-}
+      // ─── Init ───
+      async function init() {
+        buildMotionGrid();
+        renderAllSlotLists();
+        try {
+          const resp = await fetch("stone_base.json");
+          if (!resp.ok) throw new Error("fetch failed");
+          originalBaseData = await resp.json();
+        } catch (e) {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = ".json";
+          input.onchange = async () => {
+            const text = await input.files[0].text();
+            originalBaseData = JSON.parse(text);
+            currentBaseData = cloneJ(originalBaseData);
+            renderAllSlotLists();
+            renderPreview();
+          };
+          alert(
+            "stone_base.json을 불러올 수 없습니다. 파일을 직접 선택해주세요.",
+          );
+          input.click();
+          return;
+        }
+        currentBaseData = cloneJ(originalBaseData);
+        renderPreview();
+      }
 
-function buildCroppedJson() {
-  if (!cropData) return null;
-  const src = cloneJ(cropData);
-  const ow=src.w, oh=src.h;
-  const output = {
-    v:src.v, fr:src.fr, ip:src.ip||0, op:src.op,
-    w:CANVAS_W, h:CANVAS_H, nm:'cropped', ddd:src.ddd||0,
-    assets:[], layers:[], markers:src.markers||[]
-  };
-  const prefix='crop_';
-  const assetIdMap={};
-  (src.assets||[]).forEach(asset => {
-    const oldId=asset.id, newId=prefix+oldId;
-    assetIdMap[oldId]=newId; asset.id=newId;
-    output.assets.push(asset);
-  });
-  const indOffset=5000;
-  const processedLayers = src.layers.map(layer => {
-    const nl=cloneJ(layer);
-    if(nl.ind!==undefined) nl.ind+=indOffset;
-    if(nl.parent!==undefined) nl.parent+=indOffset;
-    if(nl.refId&&assetIdMap[nl.refId]) nl.refId=assetIdMap[nl.refId];
-    return nl;
-  });
-  const compId=prefix+'main';
-  output.assets.push({id:compId,layers:processedLayers,w:ow,h:oh,nm:'cropped_comp',fr:src.fr});
-  const scaleVal=cropState.scale/100*100;
-  output.layers.push({
-    ty:0, nm:'content', sr:1, st:output.ip, op:output.op, ip:output.ip,
-    w:ow, h:oh, refId:compId, ind:1,
-    ks:{
-      a:{a:0,k:[ow/2,oh/2,0]},
-      s:{a:0,k:[scaleVal,scaleVal,100]},
-      p:{a:0,k:[CANVAS_W/2+cropState.x, CANVAS_H/2+cropState.y, 0]},
-      r:{a:0,k:0}, o:{a:0,k:100}
-    }
-  });
-  return output;
-}
+      // ─── Unified Preview (single merged Lottie — overlays follow stone) ───
+      function renderPreview() {
+        if (!window.__DotLottie) return;
+        const canvas = document.getElementById("baseCanvas");
+        const prevFrame = baseAnimation ? baseAnimation.currentFrame : 0;
+        if (baseAnimation) {
+          baseAnimation.destroy();
+          baseAnimation = null;
+        }
+        if (prevBlobUrl) {
+          URL.revokeObjectURL(prevBlobUrl);
+          prevBlobUrl = null;
+        }
+        if (!currentBaseData) return;
 
-let cropRenderTimer=null;
-function renderCropPreview() {
-  if(cropRenderTimer) clearTimeout(cropRenderTimer);
-  cropRenderTimer = setTimeout(_renderCropPreview, 80);
-}
-function _renderCropPreview() {
-  if(!window.__DotLottie||!cropData) return;
-  const canvas=document.getElementById('cropCanvas');
-  const prevFrame = cropAnimation ? cropAnimation.currentFrame : 0;
-  if(cropAnimation){cropAnimation.destroy();cropAnimation=null;}
-  if(cropBlobUrl){URL.revokeObjectURL(cropBlobUrl);cropBlobUrl=null;}
-  const animData=buildCroppedJson();
-  if(!animData) return;
-  const blob=new Blob([JSON.stringify(animData)],{type:'application/json'});
-  cropBlobUrl=URL.createObjectURL(blob);
-  cropAnimation=new window.__DotLottie({
-    canvas, autoplay:true, loop:true,
-    src:cropBlobUrl,
-    renderConfig:{devicePixelRatio:2}
-  });
-  if(prevFrame>0){
-    cropAnimation.addEventListener('load',()=>{cropAnimation.setFrame(prevFrame);cropAnimation.play();});
-  }
-}
+        const hasOverlays = anySlotLoaded();
+        const animData =
+          hasOverlays || currentMotionId !== "idle"
+            ? buildMergedJson()
+            : cloneJ(currentBaseData);
 
-function downloadCropped() {
-  if(!cropData) return;
-  const cropped=buildCroppedJson();
-  const blob=new Blob([JSON.stringify(cropped)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='lottie_cropped_300x300_'+Date.now()+'.json';
-  a.click(); URL.revokeObjectURL(url);
-}
+        const blob = new Blob([JSON.stringify(animData)], {
+          type: "application/json",
+        });
+        prevBlobUrl = URL.createObjectURL(blob);
 
-// Crop step size buttons
-document.querySelectorAll('[data-cropstep]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-cropstep]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    cropStepSize = parseInt(btn.dataset.cropstep);
-  });
-});
+        baseAnimation = new window.__DotLottie({
+          canvas,
+          autoplay: true,
+          loop: true,
+          src: prevBlobUrl,
+          renderConfig: { devicePixelRatio: 2 },
+        });
+        if (prevFrame > 0) {
+          baseAnimation.addEventListener("load", () => {
+            baseAnimation.setFrame(prevFrame);
+            baseAnimation.play();
+          });
+        }
+      }
 
-// Crop keyboard controls
-document.getElementById('tab-crop').addEventListener('keydown', e => {
-  if(!cropData) return;
-  if(e.target.tagName==='INPUT'&&e.target.type==='range') return;
-  let dx=0,dy=0;
-  switch(e.key){
-    case 'ArrowUp':dy=-1;break;case 'ArrowDown':dy=1;break;
-    case 'ArrowLeft':dx=-1;break;case 'ArrowRight':dx=1;break;default:return;
-  }
-  e.preventDefault();
-  const oldStep=cropStepSize;
-  if(e.shiftKey) cropStepSize=1;
-  moveCrop(dx,dy);
-  cropStepSize=oldStep;
-});
+      function schedulePreviewRebuild() {
+        if (previewTimer) clearTimeout(previewTimer);
+        previewTimer = setTimeout(renderPreview, 60);
+      }
 
-// Drag & drop for crop upload
-const cropArea = document.getElementById('cropUploadArea');
-cropArea.addEventListener('dragover', e => { e.preventDefault(); cropArea.style.borderColor='var(--accent)'; });
-cropArea.addEventListener('dragleave', () => { cropArea.style.borderColor=''; });
-cropArea.addEventListener('drop', e => {
-  e.preventDefault(); cropArea.style.borderColor='';
-  const file = e.dataTransfer.files[0];
-  if(file && file.name.endsWith('.json')) {
-    const dt = new DataTransfer(); dt.items.add(file);
-    document.getElementById('cropFileInput').files = dt.files;
-    handleCropUpload(document.getElementById('cropFileInput'));
-  }
-});
+      // ─── Image → Lottie JSON wrapper ───
+      function imageToLottieJson(dataUrl, w, h) {
+        return {
+          v: "5.7.0",
+          fr: 30,
+          ip: 0,
+          op: 60,
+          w: w,
+          h: h,
+          nm: "image",
+          ddd: 0,
+          assets: [{ id: "img_0", w: w, h: h, u: "", p: dataUrl, e: 1 }],
+          layers: [
+            {
+              ty: 2,
+              refId: "img_0",
+              nm: "image",
+              sr: 1,
+              st: 0,
+              op: 60,
+              ip: 0,
+              ind: 1,
+              ks: {
+                o: { a: 0, k: 100 },
+                r: { a: 0, k: 0 },
+                p: { a: 0, k: [0, 0, 0] },
+                a: { a: 0, k: [0, 0, 0] },
+                s: { a: 0, k: [100, 100, 100] },
+              },
+            },
+          ],
+        };
+      }
 
-// ─── Gallery ───
-const galleryItems = [];
+      function isImageFile(file) {
+        return /\.(png|jpe?g)$/i.test(file.name);
+      }
 
-function handleGalleryUpload(input) {
-  const files = Array.from(input.files);
-  if(!files.length) return;
-  let loaded = 0;
-  files.forEach(file => {
-    if(!file.name.endsWith('.json')) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const data = JSON.parse(e.target.result);
-        addGalleryItem(file.name, data);
-      } catch {}
-      if(++loaded >= files.length) input.value='';
-    };
-    reader.readAsText(file);
-  });
-}
+      function loadImageAsLottie(file, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const data = imageToLottieJson(
+              e.target.result,
+              img.naturalWidth,
+              img.naturalHeight,
+            );
+            callback(data);
+          };
+          img.onerror = () => alert("이미지 파일을 읽을 수 없습니다.");
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
 
-function addGalleryItem(name, data) {
-  const id = 'gal_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
-  galleryItems.push({id, name, data, blobUrl:null, anim:null});
-  updateGalleryUI();
-  renderGalleryItem(galleryItems[galleryItems.length-1]);
-}
+      // ─── Customizer inner tabs + multi-slot cards ───
+      function switchAssetPanel(panel) {
+        document.querySelectorAll(".asset-subtab-btn").forEach((b) =>
+          b.classList.toggle("active", b.dataset.assetPanel === panel),
+        );
+        document.querySelectorAll(".asset-subtab-panel").forEach((p) =>
+          p.classList.toggle("active", p.id === "asset-panel-" + panel),
+        );
+      }
 
-function removeGalleryItem(id) {
-  const idx = galleryItems.findIndex(g=>g.id===id);
-  if(idx<0) return;
-  const item = galleryItems[idx];
-  if(item.anim){try{item.anim.destroy();}catch{}}
-  if(item.blobUrl) URL.revokeObjectURL(item.blobUrl);
-  galleryItems.splice(idx,1);
-  const card = document.getElementById(id);
-  if(card) card.remove();
-  updateGalleryUI();
-}
+      const SLOT_LABEL = {
+        background: "배경",
+        bgBack: "뒷배경",
+        eyes: "눈",
+        mouth: "입",
+        accessory: "악세서리",
+      };
 
-function clearGallery() {
-  galleryItems.forEach(item => {
-    if(item.anim){try{item.anim.destroy();}catch{}}
-    if(item.blobUrl) URL.revokeObjectURL(item.blobUrl);
-  });
-  galleryItems.length = 0;
-  document.getElementById('galleryGrid').innerHTML = '';
-  updateGalleryUI();
-}
+      function clearSlotSelection() {
+        activeSlotCategory = null;
+        activeSlotId = null;
+        document.querySelectorAll(".upload-slot-card").forEach((c) => {
+          c.classList.remove("active");
+        });
+        document.getElementById("activeInfo").textContent = "선택: 없음";
+      }
 
-function updateGalleryUI() {
-  const n = galleryItems.length;
-  document.getElementById('galleryCount').textContent = n+'개';
-  document.getElementById('galleryEmpty').style.display = n ? 'none' : 'block';
-  document.getElementById('galleryClearBtn').style.display = n ? '' : 'none';
-}
+      function selectSlotCard(category, id) {
+        const slot = getSlot(category, id);
+        if (!slot || !slot.loaded) return;
+        activeSlotCategory = category;
+        activeSlotId = id;
+        document.querySelectorAll(".upload-slot-card").forEach((c) => {
+          c.classList.toggle("active", c.dataset.slotId === id);
+        });
+        const arr = slotLists[category];
+        const idx = arr.findIndex((s) => s.id === id);
+        const suffix = arr.length > 1 ? " #" + (idx + 1) : "";
+        document.getElementById("activeInfo").textContent =
+          "선택: " + SLOT_LABEL[category] + suffix;
+      }
 
-function renderGalleryItem(item) {
-  if(!window.__DotLottie) return;
-  const grid = document.getElementById('galleryGrid');
-  const card = document.createElement('div');
-  card.className = 'gallery-card';
-  card.id = item.id;
-  const canvas = document.createElement('canvas');
-  canvas.width = 400; canvas.height = 400;
-  const info = document.createElement('div');
-  info.className = 'card-info';
-  const nameEl = document.createElement('span');
-  nameEl.className = 'card-name';
-  nameEl.textContent = item.name;
-  nameEl.title = item.name;
-  const delBtn = document.createElement('button');
-  delBtn.className = 'card-del';
-  delBtn.textContent = '✕';
-  delBtn.onclick = () => removeGalleryItem(item.id);
-  info.appendChild(nameEl);
-  info.appendChild(delBtn);
-  card.appendChild(canvas);
-  card.appendChild(info);
-  grid.appendChild(card);
+      function patchSlotControls(category, id) {
+        const slot = getSlot(category, id);
+        const card = document.querySelector(
+          `.upload-slot-card[data-slot-id="${id}"]`,
+        );
+        if (!slot || !card) return;
+        const pos = card.querySelector(".slot-pos");
+        const xv = card.querySelector(".slot-xval");
+        const yv = card.querySelector(".slot-yval");
+        const sv = card.querySelector(".slot-scaleval");
+        const rx = card.querySelector(".slot-x");
+        const ry = card.querySelector(".slot-y");
+        const rs = card.querySelector(".slot-scale");
+        if (pos) pos.textContent = slot.x + "," + slot.y;
+        if (xv) xv.textContent = String(slot.x);
+        if (yv) yv.textContent = String(slot.y);
+        if (sv) sv.textContent = slot.scale + "%";
+        if (rx) rx.value = String(slot.x);
+        if (ry) ry.value = String(slot.y);
+        if (rs) rs.value = String(slot.scale);
+      }
 
-  const blob = new Blob([JSON.stringify(item.data)],{type:'application/json'});
-  item.blobUrl = URL.createObjectURL(blob);
-  item.anim = new window.__DotLottie({
-    canvas, autoplay:true, loop:true,
-    src: item.blobUrl,
-    renderConfig:{devicePixelRatio:2}
-  });
-}
+      function renderSlotList(category) {
+        const container = document.getElementById("slotList-" + category);
+        if (!container) return;
+        container.innerHTML = "";
+        const slots = slotLists[category];
+        slots.forEach((slot, index) => {
+          const card = document.createElement("div");
+          card.className =
+            "upload-slot-card" + (activeSlotId === slot.id ? " active" : "");
+          card.dataset.slotId = slot.id;
+          card.dataset.category = category;
+          card.tabIndex = 0;
+          const title =
+            (SLOT_LABEL[category] || category) +
+            (slots.length > 1 ? " #" + (index + 1) : "");
+          const disp = slot.loaded ? "flex" : "none";
+          const dispRm = slots.length > 1 ? "inline-flex" : "none";
+          card.innerHTML =
+            '<div class="slot-head"><span class="slot-label">' +
+            title +
+            '</span><span class="slot-status">' +
+            (slot.loaded ? "✓ 로드됨" : "파일 없음") +
+            '</span></div><div class="upload-row">' +
+            '<button type="button" class="btn btn-upload slot-pick">파일 선택</button>' +
+            '<span class="file-name slot-filename"></span>' +
+            '<button type="button" class="btn btn-remove slot-clearfile" style="display:' +
+            (slot.loaded ? "inline-flex" : "none") +
+            '">파일 삭제</button>' +
+            '<input type="file" class="slot-file" accept=".json,.png,.jpg,.jpeg" style="display:none" />' +
+            '</div><div class="controls-body slot-controls" style="display:' +
+            disp +
+            '"><div class="pos-scale-row"><div class="dpad">' +
+            '<div class="dpad-empty"></div><button type="button" class="dpad-btn d-u">▲</button><div class="dpad-empty"></div>' +
+            '<button type="button" class="dpad-btn d-l">◀</button>' +
+            '<div class="dpad-btn dpad-center slot-pos">0,0</div>' +
+            '<button type="button" class="dpad-btn d-r">▶</button>' +
+            '<div class="dpad-empty"></div><button type="button" class="dpad-btn d-d">▼</button><div class="dpad-empty"></div>' +
+            '</div><div class="sliders">' +
+            '<div class="slider-row"><label>크기</label><input type="range" min="10" max="300" class="slot-scale" /><span class="val slot-scaleval">100%</span></div>' +
+            '<div class="slider-row"><label>X</label><input type="range" min="-150" max="150" class="slot-x" /><span class="val slot-xval">0</span></div>' +
+            '<div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" class="slot-y" /><span class="val slot-yval">0</span></div>' +
+            "</div></div></div>" +
+            '<div class="slot-actions">' +
+            '<button type="button" class="btn btn-sm btn-add-slot" title="같은 종류 카드 추가">+</button>' +
+            '<button type="button" class="btn btn-remove btn-sm slot-removecard" style="display:' +
+            dispRm +
+            '">카드 제거</button></div>';
 
-function setGallerySize(size, btn) {
-  document.querySelectorAll('.gallery-size-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('galleryGrid').style.setProperty('--gallery-card-size', size+'px');
-}
+          card.querySelector(".slot-filename").textContent = slot.fileName || "";
 
-// Gallery drag & drop
-const galleryDrop = document.getElementById('galleryDrop');
-galleryDrop.addEventListener('dragover', e => { e.preventDefault(); galleryDrop.style.borderColor='var(--accent)'; });
-galleryDrop.addEventListener('dragleave', () => { galleryDrop.style.borderColor=''; });
-galleryDrop.addEventListener('drop', e => {
-  e.preventDefault(); galleryDrop.style.borderColor='';
-  const files = Array.from(e.dataTransfer.files).filter(f=>f.name.endsWith('.json'));
-  if(!files.length) return;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try { addGalleryItem(file.name, JSON.parse(ev.target.result)); } catch {}
-    };
-    reader.readAsText(file);
-  });
-});
+          const fileInput = card.querySelector(".slot-file");
+          card.querySelector(".slot-pick").onclick = () => fileInput.click();
+          fileInput.onchange = () => handleSlotFile(category, slot.id, fileInput);
 
-if (window.__DotLottie) {
-  init();
-} else {
-  window.addEventListener('dotlottie-ready', () => init(), {once:true});
-}
-</script>
-</body>
+          card.querySelector(".slot-clearfile").onclick = (e) => {
+            e.stopPropagation();
+            clearSlotFile(category, slot.id);
+          };
+          card.querySelector(".btn-add-slot").onclick = (e) => {
+            e.stopPropagation();
+            addSlotCard(category);
+          };
+          card.querySelector(".slot-removecard").onclick = (e) => {
+            e.stopPropagation();
+            removeSlotCard(category, slot.id);
+          };
+
+          card.addEventListener("click", (e) => {
+            if (
+              e.target.closest(".btn") ||
+              e.target.closest(".dpad-btn") ||
+              e.target.tagName === "INPUT"
+            )
+              return;
+            if (getSlot(category, slot.id)?.loaded)
+              selectSlotCard(category, slot.id);
+          });
+          card.addEventListener("focus", () => {
+            if (getSlot(category, slot.id)?.loaded)
+              selectSlotCard(category, slot.id);
+          });
+
+          card.querySelector(".d-u").onclick = (e) => {
+            e.stopPropagation();
+            moveSlot(category, slot.id, 0, -1);
+          };
+          card.querySelector(".d-d").onclick = (e) => {
+            e.stopPropagation();
+            moveSlot(category, slot.id, 0, 1);
+          };
+          card.querySelector(".d-l").onclick = (e) => {
+            e.stopPropagation();
+            moveSlot(category, slot.id, -1, 0);
+          };
+          card.querySelector(".d-r").onclick = (e) => {
+            e.stopPropagation();
+            moveSlot(category, slot.id, 1, 0);
+          };
+
+          const scaleEl = card.querySelector(".slot-scale");
+          const xEl = card.querySelector(".slot-x");
+          const yEl = card.querySelector(".slot-y");
+          scaleEl.value = String(slot.scale);
+          xEl.value = String(slot.x);
+          yEl.value = String(slot.y);
+          scaleEl.oninput = () =>
+            setSlotScale(category, slot.id, scaleEl.value);
+          xEl.oninput = () => setSlotPos(category, slot.id, "x", xEl.value);
+          yEl.oninput = () => setSlotPos(category, slot.id, "y", yEl.value);
+
+          patchSlotControls(category, slot.id);
+          container.appendChild(card);
+        });
+      }
+
+      function renderAllSlotLists() {
+        SLOT_CATS.forEach((c) => renderSlotList(c));
+      }
+
+      function applySlotFileData(category, id, data, fileName) {
+        const slot = getSlot(category, id);
+        if (!slot) return;
+        slot.data = data;
+        slot.loaded = true;
+        slot.fileName = fileName;
+        const ov = TYPES.includes(category);
+        slot.x = ov ? DEFAULT_OFFSETS[category].x : 0;
+        slot.y = ov ? DEFAULT_OFFSETS[category].y : 0;
+        slot.scale = 100;
+        renderSlotList(category);
+        selectSlotCard(category, id);
+        renderPreview();
+        updateDownloadBtn();
+      }
+
+      function handleSlotFile(category, id, input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (isImageFile(file)) {
+          loadImageAsLottie(file, (data) =>
+            applySlotFileData(category, id, data, file.name),
+          );
+          input.value = "";
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (!data.v || !data.layers) throw new Error("Invalid Lottie");
+            applySlotFileData(category, id, data, file.name);
+          } catch (err) {
+            alert("유효한 Lottie JSON 파일이 아닙니다: " + err.message);
+          }
+          input.value = "";
+        };
+        reader.readAsText(file);
+      }
+
+      function clearSlotFile(category, id) {
+        const slot = getSlot(category, id);
+        if (!slot) return;
+        slot.data = null;
+        slot.loaded = false;
+        slot.fileName = "";
+        slot.scale = 100;
+        if (TYPES.includes(category)) {
+          slot.x = DEFAULT_OFFSETS[category].x;
+          slot.y = DEFAULT_OFFSETS[category].y;
+        } else {
+          slot.x = 0;
+          slot.y = 0;
+        }
+        if (activeSlotId === id) clearSlotSelection();
+        renderSlotList(category);
+        renderPreview();
+        updateDownloadBtn();
+      }
+
+      function addSlotCard(category) {
+        slotLists[category].push(emptySlot(category));
+        renderSlotList(category);
+      }
+
+      function removeSlotCard(category, id) {
+        const arr = slotLists[category];
+        if (arr.length <= 1) {
+          clearSlotFile(category, id);
+          return;
+        }
+        const idx = arr.findIndex((s) => s.id === id);
+        if (idx < 0) return;
+        arr.splice(idx, 1);
+        if (activeSlotId === id) clearSlotSelection();
+        renderSlotList(category);
+        renderPreview();
+        updateDownloadBtn();
+      }
+
+      function moveSlot(category, id, dx, dy) {
+        const slot = getSlot(category, id);
+        if (!slot || !slot.loaded) return;
+        slot.x = Math.round(
+          Math.max(-150, Math.min(150, slot.x + dx * stepSize)),
+        );
+        slot.y = Math.round(
+          Math.max(-150, Math.min(150, slot.y + dy * stepSize)),
+        );
+        patchSlotControls(category, id);
+        schedulePreviewRebuild();
+      }
+
+      function setSlotPos(category, id, axis, val) {
+        const slot = getSlot(category, id);
+        if (!slot || !slot.loaded) return;
+        if (axis === "x") slot.x = parseInt(val, 10);
+        else slot.y = parseInt(val, 10);
+        patchSlotControls(category, id);
+        schedulePreviewRebuild();
+      }
+
+      function setSlotScale(category, id, val) {
+        const slot = getSlot(category, id);
+        if (!slot) return;
+        slot.scale = parseInt(val, 10);
+        const card = document.querySelector(
+          `.upload-slot-card[data-slot-id="${id}"]`,
+        );
+        const sv = card && card.querySelector(".slot-scaleval");
+        if (sv) sv.textContent = slot.scale + "%";
+        if (slot.loaded) schedulePreviewRebuild();
+      }
+
+      function updateDownloadBtn() {
+        const hasMotion = currentMotionId !== "idle";
+        document.getElementById("downloadBtn").disabled = !(
+          anySlotLoaded() || hasMotion
+        );
+      }
+
+      // ─── Merge & Download ───
+      function createLoopTimeRemap(innerDurSec, outerOp, outerFr) {
+        const outerDurFrames = outerOp;
+        const innerFrames = Math.round(innerDurSec * outerFr);
+        if (innerFrames >= outerDurFrames) return null;
+        const kf = [];
+        let f = 0;
+        while (f < outerDurFrames) {
+          kf.push({ t: f, s: [0] });
+          if (f + innerFrames < outerDurFrames) {
+            kf.push({
+              t: f + innerFrames - 1,
+              s: [innerDurSec - 1 / outerFr],
+              h: 1,
+            });
+            f += innerFrames;
+          } else {
+            const rem = outerDurFrames - f;
+            kf.push({ t: f + rem, s: [rem / outerFr] });
+            break;
+          }
+        }
+        return { a: 1, k: kf };
+      }
+
+      function scaleAnimTimes(obj, ratio) {
+        if (!obj || typeof obj !== "object") return;
+        if (Array.isArray(obj)) {
+          for (const item of obj) scaleAnimTimes(item, ratio);
+          return;
+        }
+        if (
+          obj.a === 1 &&
+          Array.isArray(obj.k) &&
+          obj.k.length > 0 &&
+          obj.k[0] &&
+          typeof obj.k[0] === "object" &&
+          "t" in obj.k[0]
+        ) {
+          for (const kf of obj.k) {
+            if ("t" in kf) kf.t = Math.round(kf.t * ratio);
+          }
+          return;
+        }
+        for (const v of Object.values(obj)) scaleAnimTimes(v, ratio);
+      }
+
+      function buildMergedJson() {
+        const merged = cloneJ(currentBaseData);
+        const baseFr = merged.fr;
+
+        const stoneInfo = getStoneParentChain(merged);
+        const hasStone = stoneInfo && stoneInfo.stoneInd != null;
+
+        let dynLayerInd = 80;
+        const nextInd = () => ++dynLayerInd;
+
+        TYPES.forEach((type) => {
+          slotLists[type].forEach((el) => {
+            if (!el.loaded || !el.data) return;
+            const src = cloneJ(el.data);
+            const safeId = String(el.id).replace(/[^a-zA-Z0-9_]/g, "_");
+            const prefix = type + "_" + safeId + "_";
+            const indOffset =
+              1000 +
+              (Math.abs(
+                safeId.split("").reduce((a, c) => a + c.charCodeAt(0), 0),
+              ) %
+                800);
+            const assetIdMap = {};
+            (src.assets || []).forEach((asset) => {
+              const oldId = asset.id;
+              const newId = prefix + oldId;
+              assetIdMap[oldId] = newId;
+              asset.id = newId;
+              merged.assets.push(asset);
+            });
+            const processedLayers = src.layers.map((layer) => {
+              const nl = cloneJ(layer);
+              if (nl.ind !== undefined) nl.ind = nl.ind + indOffset;
+              if (nl.parent !== undefined) nl.parent = nl.parent + indOffset;
+              if (nl.refId && assetIdMap[nl.refId])
+                nl.refId = assetIdMap[nl.refId];
+              return nl;
+            });
+            const compId = prefix + "comp";
+            const srcFr = src.fr || baseFr;
+            merged.assets.push({
+              id: compId,
+              layers: processedLayers,
+              w: src.w,
+              h: src.h,
+              nm: type + "_composition",
+              fr: srcFr,
+            });
+            const ow = src.w,
+              oh = src.h;
+
+            let posX, posY, scaleX, scaleY, parentInd;
+            const canvasCx = CANVAS_W / 2 + el.x,
+              canvasCy = CANVAS_H / 2 + el.y;
+
+            const fitRatio = Math.max(CANVAS_W / ow, CANVAS_H / oh);
+            if (hasStone) {
+              const local = canvasToStoneLocal(canvasCx, canvasCy, merged);
+              posX = local.x;
+              posY = local.y;
+              scaleX = (fitRatio * el.scale) / stoneInfo.totalSx;
+              scaleY = (fitRatio * el.scale) / stoneInfo.totalSy;
+              parentInd = stoneInfo.stoneInd;
+            } else {
+              posX = canvasCx;
+              posY = canvasCy;
+              scaleX = fitRatio * el.scale;
+              scaleY = fitRatio * el.scale;
+            }
+
+            const compLayer = {
+              ty: 0,
+              nm: type + "_" + safeId,
+              sr: 1,
+              st: merged.ip,
+              op: merged.op,
+              ip: merged.ip,
+              w: ow,
+              h: oh,
+              refId: compId,
+              ind: nextInd(),
+              ks: {
+                a: { a: 0, k: [ow / 2, oh / 2, 0] },
+                s: { a: 0, k: [scaleX, scaleY, 100] },
+                p: { a: 0, k: [posX, posY, 0] },
+                r: { a: 0, k: 0 },
+                o: { a: 0, k: 100 },
+              },
+            };
+            if (parentInd !== undefined) compLayer.parent = parentInd;
+
+            const innerDurSec = (src.op - (src.ip || 0)) / srcFr;
+            const outerOp = merged.op - merged.ip;
+            const tm = createLoopTimeRemap(innerDurSec, outerOp, baseFr);
+            if (tm) compLayer.tm = tm;
+            merged.layers.unshift(compLayer);
+          });
+        });
+
+        slotLists.background
+          .filter((s) => s.loaded && s.data)
+          .slice()
+          .reverse()
+          .forEach((bgEl) => {
+            const src = cloneJ(bgEl.data);
+            const safeId = String(bgEl.id).replace(/[^a-zA-Z0-9_]/g, "_");
+            const prefix = "bg_" + safeId + "_";
+            const indOffset =
+              4000 +
+              (Math.abs(
+                safeId.split("").reduce((a, c) => a + c.charCodeAt(0), 0),
+              ) %
+                900);
+            const assetIdMap = {};
+            (src.assets || []).forEach((asset) => {
+              const oldId = asset.id;
+              const newId = prefix + oldId;
+              assetIdMap[oldId] = newId;
+              asset.id = newId;
+              merged.assets.push(asset);
+            });
+            const processedLayers = src.layers.map((layer) => {
+              const nl = cloneJ(layer);
+              if (nl.ind !== undefined) nl.ind += indOffset;
+              if (nl.parent !== undefined) nl.parent += indOffset;
+              if (nl.refId && assetIdMap[nl.refId])
+                nl.refId = assetIdMap[nl.refId];
+              return nl;
+            });
+            const compId = prefix + "comp";
+            const bgFr = src.fr || merged.fr;
+            merged.assets.push({
+              id: compId,
+              layers: processedLayers,
+              w: src.w,
+              h: src.h,
+              nm: "bg_composition_" + safeId,
+              fr: bgFr,
+            });
+            const ow = src.w,
+              oh = src.h;
+            const coverRatio = Math.max(CANVAS_W / ow, CANVAS_H / oh);
+            const scaleX = coverRatio * bgEl.scale,
+              scaleY = coverRatio * bgEl.scale;
+            const posX = CANVAS_W / 2 + bgEl.x,
+              posY = CANVAS_H / 2 + bgEl.y;
+            const bgLayer = {
+              ty: 0,
+              nm: "background_" + safeId,
+              sr: 1,
+              st: merged.ip,
+              op: merged.op,
+              ip: merged.ip,
+              w: ow,
+              h: oh,
+              refId: compId,
+              ind: nextInd(),
+              ks: {
+                a: { a: 0, k: [ow / 2, oh / 2, 0] },
+                s: { a: 0, k: [scaleX, scaleY, 100] },
+                p: { a: 0, k: [posX, posY, 0] },
+                r: { a: 0, k: 0 },
+                o: { a: 0, k: 100 },
+              },
+            };
+            const bgInnerDurSec = (src.op - (src.ip || 0)) / bgFr;
+            const outerOp = merged.op - merged.ip;
+            const tm = createLoopTimeRemap(bgInnerDurSec, outerOp, merged.fr);
+            if (tm) bgLayer.tm = tm;
+            merged.layers.unshift(bgLayer);
+          });
+
+        slotLists.bgBack
+          .filter((s) => s.loaded && s.data)
+          .forEach((bgBackEl) => {
+            const src = cloneJ(bgBackEl.data);
+            const safeId = String(bgBackEl.id).replace(/[^a-zA-Z0-9_]/g, "_");
+            const prefix = "bgb_" + safeId + "_";
+            const indOffset =
+              6000 +
+              (Math.abs(
+                safeId.split("").reduce((a, c) => a + c.charCodeAt(0), 0),
+              ) %
+                900);
+            const assetIdMap = {};
+            (src.assets || []).forEach((asset) => {
+              const oldId = asset.id;
+              const newId = prefix + oldId;
+              assetIdMap[oldId] = newId;
+              asset.id = newId;
+              merged.assets.push(asset);
+            });
+            const processedLayers = src.layers.map((layer) => {
+              const nl = cloneJ(layer);
+              if (nl.ind !== undefined) nl.ind += indOffset;
+              if (nl.parent !== undefined) nl.parent += indOffset;
+              if (nl.refId && assetIdMap[nl.refId])
+                nl.refId = assetIdMap[nl.refId];
+              return nl;
+            });
+            const compId = prefix + "comp";
+            const bgbFr = src.fr || merged.fr;
+            merged.assets.push({
+              id: compId,
+              layers: processedLayers,
+              w: src.w,
+              h: src.h,
+              nm: "bgback_composition_" + safeId,
+              fr: bgbFr,
+            });
+            const ow = src.w,
+              oh = src.h;
+            const coverRatio = Math.max(CANVAS_W / ow, CANVAS_H / oh);
+            const scaleX = coverRatio * bgBackEl.scale,
+              scaleY = coverRatio * bgBackEl.scale;
+            const posX = CANVAS_W / 2 + bgBackEl.x,
+              posY = CANVAS_H / 2 + bgBackEl.y;
+            const bgbLayer = {
+              ty: 0,
+              nm: "back_background_" + safeId,
+              sr: 1,
+              st: merged.ip,
+              op: merged.op,
+              ip: merged.ip,
+              w: ow,
+              h: oh,
+              refId: compId,
+              ind: nextInd(),
+              ks: {
+                a: { a: 0, k: [ow / 2, oh / 2, 0] },
+                s: { a: 0, k: [scaleX, scaleY, 100] },
+                p: { a: 0, k: [posX, posY, 0] },
+                r: { a: 0, k: 0 },
+                o: { a: 0, k: 100 },
+              },
+            };
+            const bgbInnerDurSec = (src.op - (src.ip || 0)) / bgbFr;
+            const outerOp = merged.op - merged.ip;
+            const tm = createLoopTimeRemap(bgbInnerDurSec, outerOp, merged.fr);
+            if (tm) bgbLayer.tm = tm;
+            merged.layers.push(bgbLayer);
+          });
+
+        return merged;
+      }
+
+      function downloadMerged() {
+        const merged = buildMergedJson();
+        const blob = new Blob([JSON.stringify(merged)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "stone_custom_" + Date.now() + ".json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // ─── Event Listeners ───
+      document.querySelectorAll(".step-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".step-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          stepSize = parseInt(btn.dataset.step);
+        });
+      });
+      document.addEventListener("keydown", (e) => {
+        if (
+          !document
+            .getElementById("tab-customizer")
+            .classList.contains("active")
+        )
+          return;
+        if (!activeSlotId || !activeSlotCategory) return;
+        const slot = getSlot(activeSlotCategory, activeSlotId);
+        if (!slot || !slot.loaded) return;
+        if (e.target.tagName === "INPUT" && e.target.type === "range") return;
+        const s = e.shiftKey ? 1 : stepSize;
+        let dx = 0,
+          dy = 0;
+        switch (e.key) {
+          case "ArrowUp":
+            dy = -1;
+            break;
+          case "ArrowDown":
+            dy = 1;
+            break;
+          case "ArrowLeft":
+            dx = -1;
+            break;
+          case "ArrowRight":
+            dx = 1;
+            break;
+          default:
+            return;
+        }
+        e.preventDefault();
+        const old = stepSize;
+        stepSize = s;
+        moveSlot(activeSlotCategory, activeSlotId, dx, dy);
+        stepSize = old;
+      });
+
+      // ─── Tab Switching ───
+      function switchTab(tabId) {
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document
+          .querySelector(`.tab-btn[data-tab="${tabId}"]`)
+          .classList.add("active");
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        document.getElementById("tab-" + tabId).classList.add("active");
+        const subtitles = {
+          customizer:
+            "움직임을 선택하고, 눈·입·악세서리를 올려 나만의 돌맹이를 만들어보세요",
+          crop: "완성된 Lottie 파일을 300×300 크기로 조절하여 추출하세요",
+          gallery: "Lottie JSON 파일을 올려 한눈에 미리보기하세요",
+        };
+        document.getElementById("headerSubtitle").textContent =
+          subtitles[tabId] || "";
+      }
+
+      // ─── Lottie Crop Tool ───
+      let cropData = null;
+      let cropAnimation = null;
+      let cropBlobUrl = null;
+      let cropState = { x: 0, y: 0, scale: 100 };
+      let cropStepSize = 3;
+
+      function handleCropUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            cropData = JSON.parse(e.target.result);
+          } catch {
+            alert("올바른 JSON 파일이 아닙니다");
+            return;
+          }
+          const durSec =
+            Math.round(
+              ((cropData.op - (cropData.ip || 0)) / cropData.fr) * 10,
+            ) / 10;
+          document.getElementById("cropFileName").textContent = file.name;
+          document.getElementById("cropFileDetail").textContent =
+            `${cropData.w}×${cropData.h} | ${cropData.fr}fps | ${durSec}초`;
+          document.getElementById("cropOrigSize").textContent =
+            `원본: ${cropData.w}×${cropData.h}`;
+          document.getElementById("cropFileInfo").classList.add("visible");
+          document.getElementById("cropAdjust").classList.add("visible");
+          document.getElementById("cropDownloadBtn").disabled = false;
+          document.getElementById("cropUploadArea").classList.add("has-file");
+          cropState = { x: 0, y: 0, scale: 100 };
+          updateCropUI();
+          renderCropPreview();
+        };
+        reader.readAsText(file);
+      }
+
+      function removeCropFile() {
+        cropData = null;
+        if (cropAnimation) {
+          cropAnimation.destroy();
+          cropAnimation = null;
+        }
+        if (cropBlobUrl) {
+          URL.revokeObjectURL(cropBlobUrl);
+          cropBlobUrl = null;
+        }
+        document.getElementById("cropFileInfo").classList.remove("visible");
+        document.getElementById("cropAdjust").classList.remove("visible");
+        document.getElementById("cropDownloadBtn").disabled = true;
+        document.getElementById("cropUploadArea").classList.remove("has-file");
+        document.getElementById("cropFileInput").value = "";
+        const ctx = document.getElementById("cropCanvas").getContext("2d");
+        ctx.clearRect(0, 0, 800, 800);
+      }
+
+      function updateCropUI() {
+        document.getElementById("cropScaleVal").textContent =
+          cropState.scale + "%";
+        document.getElementById("cropXVal").textContent = cropState.x;
+        document.getElementById("cropYVal").textContent = cropState.y;
+        document.getElementById("cropPos").textContent =
+          cropState.x + "," + cropState.y;
+        document.getElementById("cropScaleRange").value = cropState.scale;
+        document.getElementById("cropRangeX").value = cropState.x;
+        document.getElementById("cropRangeY").value = cropState.y;
+      }
+
+      function setCropScale(v) {
+        cropState.scale = parseInt(v);
+        updateCropUI();
+        renderCropPreview();
+      }
+
+      function setCropPos(axis, v) {
+        cropState[axis] = parseInt(v);
+        updateCropUI();
+        renderCropPreview();
+      }
+
+      function moveCrop(dx, dy) {
+        cropState.x += dx * cropStepSize;
+        cropState.y += dy * cropStepSize;
+        updateCropUI();
+        renderCropPreview();
+      }
+
+      function buildCroppedJson() {
+        if (!cropData) return null;
+        const src = cloneJ(cropData);
+        const ow = src.w,
+          oh = src.h;
+        const output = {
+          v: src.v,
+          fr: src.fr,
+          ip: src.ip || 0,
+          op: src.op,
+          w: CANVAS_W,
+          h: CANVAS_H,
+          nm: "cropped",
+          ddd: src.ddd || 0,
+          assets: [],
+          layers: [],
+          markers: src.markers || [],
+        };
+        const prefix = "crop_";
+        const assetIdMap = {};
+        (src.assets || []).forEach((asset) => {
+          const oldId = asset.id,
+            newId = prefix + oldId;
+          assetIdMap[oldId] = newId;
+          asset.id = newId;
+          output.assets.push(asset);
+        });
+        const indOffset = 5000;
+        const processedLayers = src.layers.map((layer) => {
+          const nl = cloneJ(layer);
+          if (nl.ind !== undefined) nl.ind += indOffset;
+          if (nl.parent !== undefined) nl.parent += indOffset;
+          if (nl.refId && assetIdMap[nl.refId]) nl.refId = assetIdMap[nl.refId];
+          return nl;
+        });
+        const compId = prefix + "main";
+        output.assets.push({
+          id: compId,
+          layers: processedLayers,
+          w: ow,
+          h: oh,
+          nm: "cropped_comp",
+          fr: src.fr,
+        });
+        const scaleVal = (cropState.scale / 100) * 100;
+        output.layers.push({
+          ty: 0,
+          nm: "content",
+          sr: 1,
+          st: output.ip,
+          op: output.op,
+          ip: output.ip,
+          w: ow,
+          h: oh,
+          refId: compId,
+          ind: 1,
+          ks: {
+            a: { a: 0, k: [ow / 2, oh / 2, 0] },
+            s: { a: 0, k: [scaleVal, scaleVal, 100] },
+            p: {
+              a: 0,
+              k: [CANVAS_W / 2 + cropState.x, CANVAS_H / 2 + cropState.y, 0],
+            },
+            r: { a: 0, k: 0 },
+            o: { a: 0, k: 100 },
+          },
+        });
+        return output;
+      }
+
+      let cropRenderTimer = null;
+      function renderCropPreview() {
+        if (cropRenderTimer) clearTimeout(cropRenderTimer);
+        cropRenderTimer = setTimeout(_renderCropPreview, 80);
+      }
+      function _renderCropPreview() {
+        if (!window.__DotLottie || !cropData) return;
+        const canvas = document.getElementById("cropCanvas");
+        const prevFrame = cropAnimation ? cropAnimation.currentFrame : 0;
+        if (cropAnimation) {
+          cropAnimation.destroy();
+          cropAnimation = null;
+        }
+        if (cropBlobUrl) {
+          URL.revokeObjectURL(cropBlobUrl);
+          cropBlobUrl = null;
+        }
+        const animData = buildCroppedJson();
+        if (!animData) return;
+        const blob = new Blob([JSON.stringify(animData)], {
+          type: "application/json",
+        });
+        cropBlobUrl = URL.createObjectURL(blob);
+        cropAnimation = new window.__DotLottie({
+          canvas,
+          autoplay: true,
+          loop: true,
+          src: cropBlobUrl,
+          renderConfig: { devicePixelRatio: 2 },
+        });
+        if (prevFrame > 0) {
+          cropAnimation.addEventListener("load", () => {
+            cropAnimation.setFrame(prevFrame);
+            cropAnimation.play();
+          });
+        }
+      }
+
+      function downloadCropped() {
+        if (!cropData) return;
+        const cropped = buildCroppedJson();
+        const blob = new Blob([JSON.stringify(cropped)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "lottie_cropped_300x300_" + Date.now() + ".json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // Crop step size buttons
+      document.querySelectorAll("[data-cropstep]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll("[data-cropstep]")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          cropStepSize = parseInt(btn.dataset.cropstep);
+        });
+      });
+
+      // Crop keyboard controls
+      document.getElementById("tab-crop").addEventListener("keydown", (e) => {
+        if (!cropData) return;
+        if (e.target.tagName === "INPUT" && e.target.type === "range") return;
+        let dx = 0,
+          dy = 0;
+        switch (e.key) {
+          case "ArrowUp":
+            dy = -1;
+            break;
+          case "ArrowDown":
+            dy = 1;
+            break;
+          case "ArrowLeft":
+            dx = -1;
+            break;
+          case "ArrowRight":
+            dx = 1;
+            break;
+          default:
+            return;
+        }
+        e.preventDefault();
+        const oldStep = cropStepSize;
+        if (e.shiftKey) cropStepSize = 1;
+        moveCrop(dx, dy);
+        cropStepSize = oldStep;
+      });
+
+      // Drag & drop for crop upload
+      const cropArea = document.getElementById("cropUploadArea");
+      cropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        cropArea.style.borderColor = "var(--accent)";
+      });
+      cropArea.addEventListener("dragleave", () => {
+        cropArea.style.borderColor = "";
+      });
+      cropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        cropArea.style.borderColor = "";
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith(".json")) {
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          document.getElementById("cropFileInput").files = dt.files;
+          handleCropUpload(document.getElementById("cropFileInput"));
+        }
+      });
+
+      // ─── Gallery ───
+      const galleryItems = [];
+
+      function handleGalleryUpload(input) {
+        const files = Array.from(input.files);
+        if (!files.length) return;
+        let loaded = 0;
+        files.forEach((file) => {
+          if (!file.name.endsWith(".json")) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const data = JSON.parse(e.target.result);
+              addGalleryItem(file.name, data);
+            } catch {}
+            if (++loaded >= files.length) input.value = "";
+          };
+          reader.readAsText(file);
+        });
+      }
+
+      function addGalleryItem(name, data) {
+        const id =
+          "gal_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+        galleryItems.push({ id, name, data, blobUrl: null, anim: null });
+        updateGalleryUI();
+        renderGalleryItem(galleryItems[galleryItems.length - 1]);
+      }
+
+      function removeGalleryItem(id) {
+        const idx = galleryItems.findIndex((g) => g.id === id);
+        if (idx < 0) return;
+        const item = galleryItems[idx];
+        if (item.anim) {
+          try {
+            item.anim.destroy();
+          } catch {}
+        }
+        if (item.blobUrl) URL.revokeObjectURL(item.blobUrl);
+        galleryItems.splice(idx, 1);
+        const card = document.getElementById(id);
+        if (card) card.remove();
+        updateGalleryUI();
+      }
+
+      function clearGallery() {
+        galleryItems.forEach((item) => {
+          if (item.anim) {
+            try {
+              item.anim.destroy();
+            } catch {}
+          }
+          if (item.blobUrl) URL.revokeObjectURL(item.blobUrl);
+        });
+        galleryItems.length = 0;
+        document.getElementById("galleryGrid").innerHTML = "";
+        updateGalleryUI();
+      }
+
+      function updateGalleryUI() {
+        const n = galleryItems.length;
+        document.getElementById("galleryCount").textContent = n + "개";
+        document.getElementById("galleryEmpty").style.display = n
+          ? "none"
+          : "block";
+        document.getElementById("galleryClearBtn").style.display = n
+          ? ""
+          : "none";
+      }
+
+      function renderGalleryItem(item) {
+        if (!window.__DotLottie) return;
+        const grid = document.getElementById("galleryGrid");
+        const card = document.createElement("div");
+        card.className = "gallery-card";
+        card.id = item.id;
+        const canvas = document.createElement("canvas");
+        canvas.width = 400;
+        canvas.height = 400;
+        const info = document.createElement("div");
+        info.className = "card-info";
+        const nameEl = document.createElement("span");
+        nameEl.className = "card-name";
+        nameEl.textContent = item.name;
+        nameEl.title = item.name;
+        const delBtn = document.createElement("button");
+        delBtn.className = "card-del";
+        delBtn.textContent = "✕";
+        delBtn.onclick = () => removeGalleryItem(item.id);
+        info.appendChild(nameEl);
+        info.appendChild(delBtn);
+        card.appendChild(canvas);
+        card.appendChild(info);
+        grid.appendChild(card);
+
+        const blob = new Blob([JSON.stringify(item.data)], {
+          type: "application/json",
+        });
+        item.blobUrl = URL.createObjectURL(blob);
+        item.anim = new window.__DotLottie({
+          canvas,
+          autoplay: true,
+          loop: true,
+          src: item.blobUrl,
+          renderConfig: { devicePixelRatio: 2 },
+        });
+      }
+
+      function setGallerySize(size, btn) {
+        document
+          .querySelectorAll(".gallery-size-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        document
+          .getElementById("galleryGrid")
+          .style.setProperty("--gallery-card-size", size + "px");
+      }
+
+      // Gallery drag & drop
+      const galleryDrop = document.getElementById("galleryDrop");
+      galleryDrop.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        galleryDrop.style.borderColor = "var(--accent)";
+      });
+      galleryDrop.addEventListener("dragleave", () => {
+        galleryDrop.style.borderColor = "";
+      });
+      galleryDrop.addEventListener("drop", (e) => {
+        e.preventDefault();
+        galleryDrop.style.borderColor = "";
+        const files = Array.from(e.dataTransfer.files).filter((f) =>
+          f.name.endsWith(".json"),
+        );
+        if (!files.length) return;
+        files.forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              addGalleryItem(file.name, JSON.parse(ev.target.result));
+            } catch {}
+          };
+          reader.readAsText(file);
+        });
+      });
+
+      if (window.__DotLottie) {
+        init();
+      } else {
+        window.addEventListener("dotlottie-ready", () => init(), {
+          once: true,
+        });
+      }
+    </script>
+  </body>
 </html>
