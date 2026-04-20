@@ -209,10 +209,10 @@ input[type="file"]{display:none}
       <div class="control-group" data-type="background" tabindex="0">
         <div class="group-header"><div class="dot"></div><span class="label">🌄 배경</span><span class="status" id="backgroundStatus">파일 없음</span></div>
         <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('background')">JSON 파일 선택</button>
+          <button class="btn btn-upload" onclick="triggerUpload('background')">파일 선택</button>
           <span class="file-name" id="backgroundFileName"></span>
           <button class="btn btn-remove" id="backgroundRemoveBtn" style="display:none" onclick="removeBg()">삭제</button>
-          <input type="file" id="backgroundFile" accept=".json" onchange="handleBgUpload(this)">
+          <input type="file" id="backgroundFile" accept=".json,.png,.jpg,.jpeg" onchange="handleBgUpload(this)">
         </div>
         <div class="controls-body" id="backgroundControls">
           <div class="pos-scale-row">
@@ -234,10 +234,10 @@ input[type="file"]{display:none}
       <div class="control-group" data-type="eyes" tabindex="0">
         <div class="group-header"><div class="dot"></div><span class="label">👀 눈</span><span class="status" id="eyesStatus">파일 없음</span></div>
         <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('eyes')">JSON 파일 선택</button>
+          <button class="btn btn-upload" onclick="triggerUpload('eyes')">파일 선택</button>
           <span class="file-name" id="eyesFileName"></span>
           <button class="btn btn-remove" id="eyesRemoveBtn" style="display:none" onclick="removeElement('eyes')">삭제</button>
-          <input type="file" id="eyesFile" accept=".json" onchange="handleUpload('eyes',this)">
+          <input type="file" id="eyesFile" accept=".json,.png,.jpg,.jpeg" onchange="handleUpload('eyes',this)">
         </div>
         <div class="controls-body" id="eyesControls">
           <div class="pos-scale-row">
@@ -259,10 +259,10 @@ input[type="file"]{display:none}
       <div class="control-group" data-type="mouth" tabindex="0">
         <div class="group-header"><div class="dot"></div><span class="label">👄 입</span><span class="status" id="mouthStatus">파일 없음</span></div>
         <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('mouth')">JSON 파일 선택</button>
+          <button class="btn btn-upload" onclick="triggerUpload('mouth')">파일 선택</button>
           <span class="file-name" id="mouthFileName"></span>
           <button class="btn btn-remove" id="mouthRemoveBtn" style="display:none" onclick="removeElement('mouth')">삭제</button>
-          <input type="file" id="mouthFile" accept=".json" onchange="handleUpload('mouth',this)">
+          <input type="file" id="mouthFile" accept=".json,.png,.jpg,.jpeg" onchange="handleUpload('mouth',this)">
         </div>
         <div class="controls-body" id="mouthControls">
           <div class="pos-scale-row">
@@ -284,10 +284,10 @@ input[type="file"]{display:none}
       <div class="control-group" data-type="accessory" tabindex="0">
         <div class="group-header"><div class="dot"></div><span class="label">🎩 악세서리</span><span class="status" id="accessoryStatus">파일 없음</span></div>
         <div class="upload-row">
-          <button class="btn btn-upload" onclick="triggerUpload('accessory')">JSON 파일 선택</button>
+          <button class="btn btn-upload" onclick="triggerUpload('accessory')">파일 선택</button>
           <span class="file-name" id="accessoryFileName"></span>
           <button class="btn btn-remove" id="accessoryRemoveBtn" style="display:none" onclick="removeElement('accessory')">삭제</button>
-          <input type="file" id="accessoryFile" accept=".json" onchange="handleUpload('accessory',this)">
+          <input type="file" id="accessoryFile" accept=".json,.png,.jpg,.jpeg" onchange="handleUpload('accessory',this)">
         </div>
         <div class="controls-body" id="accessoryControls">
           <div class="pos-scale-row">
@@ -309,10 +309,10 @@ input[type="file"]{display:none}
       <div class="control-group" data-type="bgBack" tabindex="0">
         <div class="group-header"><div class="dot"></div><span class="label">🎑 뒷배경</span><span class="status" id="bgBackStatus">파일 없음</span></div>
         <div class="upload-row">
-          <button class="btn btn-upload" onclick="document.getElementById('bgBackFile').click()">JSON 파일 선택</button>
+          <button class="btn btn-upload" onclick="document.getElementById('bgBackFile').click()">파일 선택</button>
           <span class="file-name" id="bgBackFileName"></span>
           <button class="btn btn-remove" id="bgBackRemoveBtn" style="display:none" onclick="removeBgBack()">삭제</button>
-          <input type="file" id="bgBackFile" accept=".json" onchange="handleBgBackUpload(this)">
+          <input type="file" id="bgBackFile" accept=".json,.png,.jpg,.jpeg" onchange="handleBgBackUpload(this)">
         </div>
         <div class="controls-body" id="bgBackControls">
           <div class="pos-scale-row">
@@ -776,30 +776,72 @@ function schedulePreviewRebuild() {
   previewTimer = setTimeout(renderPreview, 60);
 }
 
+// ─── Image → Lottie JSON wrapper ───
+function imageToLottieJson(dataUrl, w, h) {
+  return {
+    v:'5.7.0', fr:30, ip:0, op:60, w:w, h:h, nm:'image', ddd:0,
+    assets:[{id:'img_0', w:w, h:h, u:'', p:dataUrl, e:1}],
+    layers:[{
+      ty:2, refId:'img_0', nm:'image', sr:1, st:0, op:60, ip:0, ind:1,
+      ks:{
+        o:{a:0,k:100}, r:{a:0,k:0},
+        p:{a:0,k:[0,0,0]}, a:{a:0,k:[0,0,0]},
+        s:{a:0,k:[100,100,100]}
+      }
+    }]
+  };
+}
+
+function isImageFile(file) {
+  return /\.(png|jpe?g)$/i.test(file.name);
+}
+
+function loadImageAsLottie(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const data = imageToLottieJson(e.target.result, img.naturalWidth, img.naturalHeight);
+      callback(data);
+    };
+    img.onerror = () => alert('이미지 파일을 읽을 수 없습니다.');
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 // ─── Element Upload / Control ───
 function triggerUpload(type) { document.getElementById(type+'File').click(); }
+
+function applyElementData(type, data, fileName) {
+  elements[type].data = data;
+  elements[type].loaded = true;
+  elements[type].x = DEFAULT_OFFSETS[type].x;
+  elements[type].y = DEFAULT_OFFSETS[type].y;
+  elements[type].scale = 100;
+  document.getElementById(type+'FileName').textContent = fileName;
+  document.getElementById(type+'Status').textContent = '✓ 로드됨';
+  document.getElementById(type+'RemoveBtn').style.display = '';
+  document.getElementById(type+'Controls').classList.add('visible');
+  resetSliders(type);
+  renderPreview();
+  setActive(type);
+  updateDownloadBtn();
+}
 
 function handleUpload(type, input) {
   const file = input.files[0];
   if (!file) return;
+  if (isImageFile(file)) {
+    loadImageAsLottie(file, data => applyElementData(type, data, file.name));
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
       if (!data.v || !data.layers) throw new Error('Invalid Lottie');
-      elements[type].data = data;
-      elements[type].loaded = true;
-      elements[type].x = DEFAULT_OFFSETS[type].x;
-      elements[type].y = DEFAULT_OFFSETS[type].y;
-      elements[type].scale = 100;
-      document.getElementById(type+'FileName').textContent = file.name;
-      document.getElementById(type+'Status').textContent = '✓ 로드됨';
-      document.getElementById(type+'RemoveBtn').style.display = '';
-      document.getElementById(type+'Controls').classList.add('visible');
-      resetSliders(type);
-      renderPreview();
-      setActive(type);
-      updateDownloadBtn();
+      applyElementData(type, data, file.name);
     } catch(err) { alert('유효한 Lottie JSON 파일이 아닙니다: '+err.message); }
   };
   reader.readAsText(file);
@@ -865,25 +907,32 @@ function setActive(type) {
   } else { document.getElementById('activeInfo').textContent='선택: 없음'; }
 }
 // ─── Background (front overlay, no stone parenting) ───
+function applyBgData(data, fileName) {
+  bgElement.data = data;
+  bgElement.loaded = true;
+  bgElement.x = 0; bgElement.y = 0; bgElement.scale = 100;
+  document.getElementById('backgroundFileName').textContent = fileName;
+  document.getElementById('backgroundStatus').textContent = '✓ 로드됨';
+  document.getElementById('backgroundRemoveBtn').style.display = '';
+  document.getElementById('backgroundControls').classList.add('visible');
+  resetBgSliders();
+  renderPreview();
+  setActive('background');
+  updateDownloadBtn();
+}
 function handleBgUpload(input) {
   const file = input.files[0];
   if (!file) return;
+  if (isImageFile(file)) {
+    loadImageAsLottie(file, data => applyBgData(data, file.name));
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
       if (!data.v || !data.layers) throw new Error('Invalid Lottie');
-      bgElement.data = data;
-      bgElement.loaded = true;
-      bgElement.x = 0; bgElement.y = 0; bgElement.scale = 100;
-      document.getElementById('backgroundFileName').textContent = file.name;
-      document.getElementById('backgroundStatus').textContent = '✓ 로드됨';
-      document.getElementById('backgroundRemoveBtn').style.display = '';
-      document.getElementById('backgroundControls').classList.add('visible');
-      resetBgSliders();
-      renderPreview();
-      setActive('background');
-      updateDownloadBtn();
+      applyBgData(data, file.name);
     } catch(err) { alert('유효한 Lottie JSON 파일이 아닙니다: '+err.message); }
   };
   reader.readAsText(file);
@@ -934,25 +983,32 @@ function removeBg() {
 }
 
 // ─── Back Background (behind stone) ───
+function applyBgBackData(data, fileName) {
+  bgBackElement.data = data;
+  bgBackElement.loaded = true;
+  bgBackElement.x = 0; bgBackElement.y = 0; bgBackElement.scale = 100;
+  document.getElementById('bgBackFileName').textContent = fileName;
+  document.getElementById('bgBackStatus').textContent = '✓ 로드됨';
+  document.getElementById('bgBackRemoveBtn').style.display = '';
+  document.getElementById('bgBackControls').classList.add('visible');
+  resetBgBackSliders();
+  renderPreview();
+  setActive('bgBack');
+  updateDownloadBtn();
+}
 function handleBgBackUpload(input) {
   const file = input.files[0];
   if (!file) return;
+  if (isImageFile(file)) {
+    loadImageAsLottie(file, data => applyBgBackData(data, file.name));
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
       if (!data.v || !data.layers) throw new Error('Invalid Lottie');
-      bgBackElement.data = data;
-      bgBackElement.loaded = true;
-      bgBackElement.x = 0; bgBackElement.y = 0; bgBackElement.scale = 100;
-      document.getElementById('bgBackFileName').textContent = file.name;
-      document.getElementById('bgBackStatus').textContent = '✓ 로드됨';
-      document.getElementById('bgBackRemoveBtn').style.display = '';
-      document.getElementById('bgBackControls').classList.add('visible');
-      resetBgBackSliders();
-      renderPreview();
-      setActive('bgBack');
-      updateDownloadBtn();
+      applyBgBackData(data, file.name);
     } catch(err) { alert('유효한 Lottie JSON 파일이 아닙니다: '+err.message); }
   };
   reader.readAsText(file);
