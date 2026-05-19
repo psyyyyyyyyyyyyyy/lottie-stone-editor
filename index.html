@@ -919,6 +919,20 @@
                   onchange="handleMotionUpload(this)"
                 />
               </div>
+              <div class="slider-row" style="margin-top: 10px">
+                <label>속도</label>
+                <input
+                  type="range"
+                  id="baseSpeedRange"
+                  min="25"
+                  max="400"
+                  step="5"
+                  value="100"
+                  oninput="setBaseSpeed(this.value)"
+                  ondblclick="setBaseSpeed(100)"
+                />
+                <span class="val" id="baseSpeedVal">1.00x</span>
+              </div>
             </div>
 
             <div class="step-selector">
@@ -1213,6 +1227,7 @@
       let originalBaseData = null;
       let currentBaseData = null;
       let currentMotionId = "idle";
+      let currentBaseSpeed = 100;
       let baseAnimation = null;
       let prevBlobUrl = null;
       let previewTimer = null;
@@ -1236,6 +1251,7 @@
           x: ov ? DEFAULT_OFFSETS[category].x : 0,
           y: ov ? DEFAULT_OFFSETS[category].y : 0,
           scale: 100,
+          speed: 100,
           loaded: false,
           fileName: "",
         };
@@ -1724,7 +1740,7 @@
 
         const hasOverlays = anySlotLoaded();
         const animData =
-          hasOverlays || currentMotionId !== "idle"
+          hasOverlays || currentMotionId !== "idle" || currentBaseSpeed !== 100
             ? buildMergedJson()
             : cloneJ(currentBaseData);
 
@@ -1861,16 +1877,20 @@
         const xv = card.querySelector(".slot-xval");
         const yv = card.querySelector(".slot-yval");
         const sv = card.querySelector(".slot-scaleval");
+        const spv = card.querySelector(".slot-speedval");
         const rx = card.querySelector(".slot-x");
         const ry = card.querySelector(".slot-y");
         const rs = card.querySelector(".slot-scale");
+        const rsp = card.querySelector(".slot-speed");
         if (pos) pos.textContent = slot.x + "," + slot.y;
         if (xv) xv.textContent = String(slot.x);
         if (yv) yv.textContent = String(slot.y);
         if (sv) sv.textContent = slot.scale + "%";
+        if (spv) spv.textContent = (slot.speed / 100).toFixed(2) + "x";
         if (rx) rx.value = String(slot.x);
         if (ry) ry.value = String(slot.y);
         if (rs) rs.value = String(slot.scale);
+        if (rsp) rsp.value = String(slot.speed);
       }
 
       function renderSlotList(category) {
@@ -1914,6 +1934,7 @@
             '<div class="slider-row"><label>크기</label><input type="range" min="10" max="300" class="slot-scale" /><span class="val slot-scaleval">100%</span></div>' +
             '<div class="slider-row"><label>X</label><input type="range" min="-150" max="150" class="slot-x" /><span class="val slot-xval">0</span></div>' +
             '<div class="slider-row"><label>Y</label><input type="range" min="-150" max="150" class="slot-y" /><span class="val slot-yval">0</span></div>' +
+            '<div class="slider-row"><label>속도</label><input type="range" min="25" max="400" step="5" class="slot-speed" /><span class="val slot-speedval">1.00x</span></div>' +
             "</div></div></div>" +
             '<div class="slot-actions">' +
             '<button type="button" class="btn btn-sm btn-add-slot" title="같은 종류 카드 추가">+</button>' +
@@ -1975,13 +1996,18 @@
           const scaleEl = card.querySelector(".slot-scale");
           const xEl = card.querySelector(".slot-x");
           const yEl = card.querySelector(".slot-y");
+          const speedEl = card.querySelector(".slot-speed");
           scaleEl.value = String(slot.scale);
           xEl.value = String(slot.x);
           yEl.value = String(slot.y);
+          speedEl.value = String(slot.speed);
           scaleEl.oninput = () =>
             setSlotScale(category, slot.id, scaleEl.value);
           xEl.oninput = () => setSlotPos(category, slot.id, "x", xEl.value);
           yEl.oninput = () => setSlotPos(category, slot.id, "y", yEl.value);
+          speedEl.oninput = () =>
+            setSlotSpeed(category, slot.id, speedEl.value);
+          speedEl.ondblclick = () => setSlotSpeed(category, slot.id, 100);
 
           patchSlotControls(category, slot.id);
           container.appendChild(card);
@@ -2002,6 +2028,7 @@
         slot.x = ov ? DEFAULT_OFFSETS[category].x : 0;
         slot.y = ov ? DEFAULT_OFFSETS[category].y : 0;
         slot.scale = 100;
+        slot.speed = 100;
         renderSlotList(category);
         selectSlotCard(category, id);
         renderPreview();
@@ -2039,6 +2066,7 @@
         slot.loaded = false;
         slot.fileName = "";
         slot.scale = 100;
+        slot.speed = 100;
         if (TYPES.includes(category)) {
           slot.x = DEFAULT_OFFSETS[category].x;
           slot.y = DEFAULT_OFFSETS[category].y;
@@ -2106,36 +2134,97 @@
         if (slot.loaded) schedulePreviewRebuild();
       }
 
+      function setBaseSpeed(val) {
+        const v = Math.max(25, Math.min(400, parseInt(val, 10) || 100));
+        currentBaseSpeed = v;
+        const sv = document.getElementById("baseSpeedVal");
+        const rs = document.getElementById("baseSpeedRange");
+        if (sv) sv.textContent = (v / 100).toFixed(2) + "x";
+        if (rs) rs.value = String(v);
+        updateDownloadBtn();
+        schedulePreviewRebuild();
+      }
+      window.setBaseSpeed = setBaseSpeed;
+
+      function setSlotSpeed(category, id, val) {
+        const slot = getSlot(category, id);
+        if (!slot) return;
+        const v = Math.max(25, Math.min(400, parseInt(val, 10) || 100));
+        slot.speed = v;
+        const card = document.querySelector(
+          `.upload-slot-card[data-slot-id="${id}"]`,
+        );
+        const sv = card && card.querySelector(".slot-speedval");
+        const rs = card && card.querySelector(".slot-speed");
+        if (sv) sv.textContent = (v / 100).toFixed(2) + "x";
+        if (rs) rs.value = String(v);
+        if (slot.loaded) schedulePreviewRebuild();
+      }
+
       function updateDownloadBtn() {
         const hasMotion = currentMotionId !== "idle";
+        const hasBaseSpeedChange = currentBaseSpeed !== 100;
         document.getElementById("downloadBtn").disabled = !(
-          anySlotLoaded() || hasMotion
+          anySlotLoaded() ||
+          hasMotion ||
+          hasBaseSpeedChange
         );
       }
 
       // ─── Merge & Download ───
-      function createLoopTimeRemap(innerDurSec, outerOp, outerFr) {
+      function createLoopTimeRemap(innerDurSec, outerOp, outerFr, speed = 1) {
         const outerDurFrames = outerOp;
-        const innerFrames = Math.round(innerDurSec * outerFr);
-        if (innerFrames >= outerDurFrames) return null;
+        const cycleOuterFrames = Math.max(
+          1,
+          Math.round((innerDurSec * outerFr) / speed),
+        );
+        if (speed === 1 && cycleOuterFrames >= outerDurFrames) return null;
         const kf = [];
         let f = 0;
         while (f < outerDurFrames) {
           kf.push({ t: f, s: [0] });
-          if (f + innerFrames < outerDurFrames) {
+          if (f + cycleOuterFrames < outerDurFrames) {
             kf.push({
-              t: f + innerFrames - 1,
+              t: f + cycleOuterFrames - 1,
               s: [innerDurSec - 1 / outerFr],
               h: 1,
             });
-            f += innerFrames;
+            f += cycleOuterFrames;
           } else {
             const rem = outerDurFrames - f;
-            kf.push({ t: f + rem, s: [rem / outerFr] });
+            const innerAdv = Math.min(
+              innerDurSec,
+              (rem * speed) / outerFr,
+            );
+            kf.push({ t: f + rem, s: [innerAdv] });
             break;
           }
         }
         return { a: 1, k: kf };
+      }
+
+      function applyBaseSpeedToMerged(merged, basePct) {
+        const pct = Math.max(25, Math.min(400, basePct || 100));
+        if (pct === 100) return;
+        const timeScale = 100 / pct;
+        scaleAnimTimes(merged.layers, timeScale);
+        scaleAnimTimes(merged.assets, timeScale);
+        const scaleLayer = (layer) => {
+          if (layer.ip != null) layer.ip = Math.round(layer.ip * timeScale);
+          if (layer.op != null) layer.op = Math.round(layer.op * timeScale);
+          if (layer.st != null) layer.st = Math.round(layer.st * timeScale);
+        };
+        (merged.layers || []).forEach(scaleLayer);
+        (merged.assets || []).forEach((asset) => {
+          if (Array.isArray(asset.layers)) asset.layers.forEach(scaleLayer);
+        });
+        if (merged.ip != null)
+          merged.ip = Math.round(merged.ip * timeScale);
+        merged.op = Math.max(1, Math.round(merged.op * timeScale));
+        (merged.markers || []).forEach((m) => {
+          if (m.tm != null) m.tm = Math.round(m.tm * timeScale);
+          if (m.dr != null) m.dr = Math.round(m.dr * timeScale);
+        });
       }
 
       function scaleAnimTimes(obj, ratio) {
@@ -2162,6 +2251,7 @@
 
       function buildMergedJson() {
         const merged = cloneJ(currentBaseData);
+        applyBaseSpeedToMerged(merged, currentBaseSpeed);
         const baseFr = merged.fr;
 
         const stoneInfo = getStoneParentChain(merged);
@@ -2253,7 +2343,13 @@
 
             const innerDurSec = (src.op - (src.ip || 0)) / srcFr;
             const outerOp = merged.op - merged.ip;
-            const tm = createLoopTimeRemap(innerDurSec, outerOp, baseFr);
+            const speedRatio = (el.speed || 100) / 100;
+            const tm = createLoopTimeRemap(
+              innerDurSec,
+              outerOp,
+              baseFr,
+              speedRatio,
+            );
             if (tm) compLayer.tm = tm;
             merged.layers.unshift(compLayer);
           });
@@ -2327,7 +2423,13 @@
             };
             const bgInnerDurSec = (src.op - (src.ip || 0)) / bgFr;
             const outerOp = merged.op - merged.ip;
-            const tm = createLoopTimeRemap(bgInnerDurSec, outerOp, merged.fr);
+            const bgSpeedRatio = (bgEl.speed || 100) / 100;
+            const tm = createLoopTimeRemap(
+              bgInnerDurSec,
+              outerOp,
+              merged.fr,
+              bgSpeedRatio,
+            );
             if (tm) bgLayer.tm = tm;
             merged.layers.unshift(bgLayer);
           });
@@ -2398,7 +2500,13 @@
             };
             const bgbInnerDurSec = (src.op - (src.ip || 0)) / bgbFr;
             const outerOp = merged.op - merged.ip;
-            const tm = createLoopTimeRemap(bgbInnerDurSec, outerOp, merged.fr);
+            const bgbSpeedRatio = (bgBackEl.speed || 100) / 100;
+            const tm = createLoopTimeRemap(
+              bgbInnerDurSec,
+              outerOp,
+              merged.fr,
+              bgbSpeedRatio,
+            );
             if (tm) bgbLayer.tm = tm;
             merged.layers.push(bgbLayer);
           });
